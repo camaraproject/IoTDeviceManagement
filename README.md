@@ -17,7 +17,9 @@ Sandbox API Repository to describe, develop, document, and test the IoT Device M
 
 * Service API(s) “IoTDeviceManagement” (see APIBacklog.md) 
 * The API(s) provide(s) the API consumer with the ability to:  
-  * §Short API scope description§ !! Add here a scope description according to the API proposal
+  * manage communication functions, like activation and deactivation of voice, SMS, data services, and specific APNs, ensuring precise traffic control to prevent overload. 
+  * manage device subscription state, perform operations such as adding, activating, suspending, restoring, deactivating, and deleting IoT cards.  
+  * support real-time monitoring, provide visibility into the status of IoT cards, enabling continuous supervision and efficient control of service usage and status. 
 * Describe, develop, document, and test the API(s)
 * Started: March 2025
 <!-- * Incubating stage since: §incubation date$ --> 
