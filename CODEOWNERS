@@ -9,6 +9,6 @@
 * @maheshc01 @chenfr2-ChinaTelecom
 
 # Owners of the CODEOWNER and Maintainer.md files are the admins of CAMARA (to allow them to keep the teams within the CAMARA organization in sync in case of changes)
-/CODEOWNERS @maheshc01 @chenfr2-ChinaTelecom
+/CODEOWNERS @camaraproject/admins
 /MAINTAINERS.MD @camaraproject/admins
 
