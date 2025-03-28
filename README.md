@@ -11,7 +11,7 @@
 
 Sandbox API Repository to describe, develop, document, and test the IoT Device Management Service API(s). The repository does not yet belong to a CAMARA Sub Project.
 
-* API Repository wiki page: TBD !! Update with concrete link when available and delete the task
+* API Repository wiki page: https://lf-camaraproject.atlassian.net/wiki/x/boCeBQ
 
 ## Scope
 
@@ -20,7 +20,7 @@ Sandbox API Repository to describe, develop, document, and test the IoT Device M
   * §Short API scope description§ !! Add here a scope description according to the API proposal
 * Describe, develop, document, and test the API(s)
 * Started: March 2025
-<!-- * Incubating stage since: §incubation date$ --> 
+<!-- * Incubating stage since: §incubation date$ -->
 
 ## Release Information
 
@@ -32,11 +32,11 @@ The repository has no (pre)releases yet, work in progress is within the main bra
 <!-- For changes see [CHANGELOG.md](https://github.com/camaraproject/IoTDeviceManagement/blob/main/CHANGELOG.md) -->
 
 ## Contributing
-* Meetings are held virtually <!-- for new, independent Sandbox API repositories request a meeting link from the LF admin team or replace the information with the existing meeting information of the Sub Project -->
-    * Schedule: !! TBD
-    * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
-    * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/AgDe) !! update this link to your wiki page using the "Share" link and delete the task
+
+* Meetings are held virtually
+  * Schedule: !! TBD
+  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
+  * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/p4CgBQ)
 * Mailing List !! TBD
-    <!-- Note: the $mailinglistname$ is either already existing (for API Repositories within a Sub Projects) or will be created by the CAMARA Admin Team. -->
-    * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/$mailinglistname§>.
-    * A message to the community of this Sub Project can be sent using <$mailinglistname§@lists.camaraproject.org>.
+  * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-IoT-Device-Management>.
+  * A message to the community of this Sub Project can be sent using <sp-IoT-Device-Management@lists.camaraproject.org>.
