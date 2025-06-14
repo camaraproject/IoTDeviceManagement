@@ -37,6 +37,6 @@ The repository has no (pre)releases yet, work in progress is within the main bra
   * Schedule: !! TBD
   * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
   * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/p4CgBQ)
-* Mailing List !! TBD
+* Mailing List
   * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-IoT-Device-Management>.
   * A message to the community of this Sub Project can be sent using <sp-IoT-Device-Management@lists.camaraproject.org>.
