@@ -36,9 +36,9 @@ The repository has no (pre)releases yet, work in progress is within the main bra
 ## Contributing
 
 * Meetings are held virtually
-  * Schedule: !! TBD
-  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
+  * Schedule: bi-weekly, Tuesday, 13:00 UTC
+  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meeting/99489769217?password=b970b062-a3ef-4a58-95ed-2b15610d84fb)
   * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/p4CgBQ)
-* Mailing List !! TBD
+* Mailing List
   * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-IoT-Device-Management>.
   * A message to the community of this Sub Project can be sent using <sp-IoT-Device-Management@lists.camaraproject.org>.
