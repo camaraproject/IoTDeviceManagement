@@ -17,7 +17,9 @@ Sandbox API Repository to describe, develop, document, and test the IoT Device M
 
 * Service API(s) “IoTDeviceManagement” (see APIBacklog.md) 
 * The API(s) provide(s) the API consumer with the ability to:  
-  * §Short API scope description§ !! Add here a scope description according to the API proposal
+  * manage communication functions, like activation and deactivation of voice, SMS, data services, and specific APNs, ensuring precise traffic control to prevent overload. 
+  * manage device subscription state, perform operations such as adding, activating, suspending, restoring, deactivating, and deleting IoT cards.  
+  * support real-time monitoring, provide visibility into the status of IoT cards, enabling continuous supervision and efficient control of service usage and status. 
 * Describe, develop, document, and test the API(s)
 * Started: March 2025
 <!-- * Incubating stage since: §incubation date$ -->
@@ -34,8 +36,8 @@ The repository has no (pre)releases yet, work in progress is within the main bra
 ## Contributing
 
 * Meetings are held virtually
-  * Schedule: !! TBD
-  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meetings/telcoapi) !! Update this link with your meeting registration/join link and delete the task
+  * Schedule: bi-weekly, Tuesday, 13:00 UTC
+  * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meeting/99489769217?password=b970b062-a3ef-4a58-95ed-2b15610d84fb)
   * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/wiki/x/p4CgBQ)
 * Mailing List
   * Subscribe / Unsubscribe to the mailing list <https://lists.camaraproject.org/g/sp-IoT-Device-Management>.
