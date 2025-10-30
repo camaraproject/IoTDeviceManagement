@@ -4,12 +4,12 @@ info:
   version: wip
   description: |
     # Introduction
-    
+
     This API allows enterprise customers to manage the communication function of IoT devices, including activation and deactivation of VOICE, SMS, and DATA services.
 
     This API is part of the IoT Device Management API family which includes:
     - Communication Function Management (this API)
-    - Device Subscription State Management 
+    - Device Subscription State Management
     - Real-Time Monitoring
 
     Operators can obtain the status by querying the information in the Connection Management Platform and UDM/HSS contracted network element devices of the mobile network.
@@ -20,7 +20,7 @@ info:
 
     **Device**: A device refers to any physical entity that can connect to a network and participate in network communication.
       At least one identifier for the device (user equipment) out of four options: IPv4 address, IPv6 address, Phone number, or Network Access Identifier (not supported for this API version) assigned by the mobile network operator for the device.
-    
+
     **FunctionType**: The type of communication function contains only SMS, VOICE and DATA.
 
     # API functionality
@@ -185,7 +185,7 @@ paths:
           $ref: '#/components/responses/UnprocessableContent'
         "429":
           $ref: '#/components/responses/TooManyRequests'
-          
+
   "/deactivate":
     post:
       summary: Deactivate communication function for IoT devices
