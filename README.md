@@ -24,14 +24,13 @@ Sandbox API Repository to describe, develop, document, and test the IoT Device M
 * Started: March 2025
 <!-- * Incubating stage since: §incubation date$ -->
 
+<!-- CAMARA:RELEASE-INFO:START -->
+<!-- The following section is automatically maintained by the CAMARA project-administration tooling: https://github.com/camaraproject/project-administration -->
+
 ## Release Information
 
 The repository has no (pre)releases yet, work in progress is within the main branch.
-<!-- Optional: an explicit listing of the latest (pre-)release with additional information, e.g. links to the API definitions -->
-<!-- In addition use/uncomment one or multiple the following alternative options when becoming applicable -->
-<!-- Pre-releases of this sub project are available in https://github.com/camaraproject/IoTDeviceManagement/releases -->
-<!-- The latest public release is available here: https://github.com/camaraproject/IoTDeviceManagement/releases/latest -->
-<!-- For changes see [CHANGELOG.md](https://github.com/camaraproject/IoTDeviceManagement/blob/main/CHANGELOG.md) -->
+<!-- CAMARA:RELEASE-INFO:END -->
 
 ## Contributing
 
