@@ -1,0 +1,778 @@
+openapi: 3.0.3
+info:
+  title: eSIM Profile Management Subscriptions API
+  description: |
+    CAMARA eSIM Profile Management Subscriptions API v0.1 - Event subscription management for eSIM Profile operations
+
+    # Introduction
+
+    This API provides event subscription capabilities for eSIM Profile Management operations. API consumers can subscribe to receive notifications when eSIM Profile operations complete (download, enable, disable, delete, set-fallback).
+
+    The API follows CAMARA CloudEvents-based subscription model for event notifications.
+
+    **Key roles**
+
+    | **Role Name** | **Description** |
+    | ---- | ------- |
+    | API Consumer | The entity that subscribes to eSIM Profile operation events |
+    | API Provider | The entity that provides the event subscription service |
+    | Network Provider | The entity that manages eSIM Profile operations and generates events |
+
+    # Event Types
+
+    This API supports subscription to the following event types:
+
+    - `org.camaraproject.esim-profile-management.v0.operation-completed` - Triggered when any eSIM Profile operation completes (success or failure)
+
+    # Subscription Model
+
+    Subscriptions are managed as resources with full CRUD operations:
+    - **POST /subscriptions** - Create a new event subscription
+    - **GET /subscriptions** - List all subscriptions
+    - **GET /subscriptions/{subscriptionId}** - Retrieve a specific subscription
+    - **DELETE /subscriptions/{subscriptionId}** - Delete a subscription
+
+    # Event Notification
+
+    When a subscribed event occurs, a CloudEvents-formatted notification is sent to the configured sink URL via HTTP POST.
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: wip
+  x-camara-commonalities: 0.6
+
+servers:
+  - url: "{apiRoot}/esim-profile-management-subscriptions/vwip"
+    variables:
+      apiRoot:
+        default: http://localhost:9091
+        description: API root, defined by the service provider
+
+tags:
+  - name: Event Subscriptions
+    description: Manage event subscriptions for eSIM Profile operations
+
+paths:
+  /subscriptions:
+    post:
+      tags:
+        - Event Subscriptions
+      summary: Create event subscription
+      description: |
+        Creates a new subscription to receive notifications for eSIM Profile operation events.
+        
+        The subscription can be created synchronously (201) or asynchronously (202).
+      operationId: createSubscription
+      security:
+        - openId:
+            - esim-profile-management-subscriptions:org.camaraproject.esim-profile-management.v0.operation-completed:create
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
+            examples:
+              subscribe_all_operations:
+                summary: Subscribe to all operation events for a device
+                value:
+                  protocol: HTTP
+                  sink: "https://application-server.com/notifications"
+                  sinkCredential:
+                    credentialType: ACCESSTOKEN
+                    accessToken: "eyJ2ZXIiOiIxLjAiLCJ0eXAiOiJKV1QiL.."
+                    accessTokenExpiresUtc: "2024-12-06T14:37:56.147Z"
+                    accessTokenType: bearer
+                  types:
+                    - org.camaraproject.esim-profile-management.v0.operation-completed
+                  config:
+                    subscriptionDetail:
+                      esimProfile:
+                        eid: "89049032000000000000000000000001"
+                    subscriptionExpireTime: "2024-12-31T23:59:59Z"
+              subscribe_specific_profile:
+                summary: Subscribe to events for a specific profile
+                value:
+                  protocol: HTTP
+                  sink: "https://application-server.com/notifications"
+                  types:
+                    - org.camaraproject.esim-profile-management.v0.operation-completed
+                  config:
+                    subscriptionDetail:
+                      esimProfile:
+                        iccid: "8901260123456789012"
+                    subscriptionMaxEvents: 10
+      responses:
+        '201':
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+              examples:
+                subscription_created:
+                  value:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    protocol: HTTP
+                    sink: "https://application-server.com/notifications"
+                    types:
+                      - org.camaraproject.esim-profile-management.v0.operation-completed
+                    config:
+                      subscriptionDetail:
+                        esimProfile:
+                          eid: "89049032000000000000000000000001"
+                      subscriptionExpireTime: "2024-12-31T23:59:59Z"
+                    startsAt: "2024-01-15T10:00:00Z"
+                    expiresAt: "2024-12-31T23:59:59Z"
+                    status: ACTIVE
+        '202':
+          description: Subscription creation request accepted (asynchronous)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+              examples:
+                subscription_pending:
+                  value:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    protocol: HTTP
+                    sink: "https://application-server.com/notifications"
+                    types:
+                      - org.camaraproject.esim-profile-management.v0.operation-completed
+                    config:
+                      subscriptionDetail:
+                        esimProfile:
+                          eid: "89049032000000000000000000000001"
+                    startsAt: "2024-01-15T10:00:00Z"
+                    status: ACTIVATION_REQUESTED
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '409':
+          $ref: '#/components/responses/Generic409'
+        '422':
+          $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
+
+    get:
+      tags:
+        - Event Subscriptions
+      summary: List event subscriptions
+      description: |
+        Retrieves a list of event subscriptions. Can be filtered by event type or expiration time.
+      operationId: listSubscriptions
+      security:
+        - openId:
+            - esim-profile-management-subscriptions:read
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - name: type
+          in: query
+          description: Filter by event type
+          schema:
+            $ref: '#/components/schemas/SubscriptionEventType'
+        - name: expiresAt.lt
+          in: query
+          description: Filter subscriptions expiring before this date-time
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of subscriptions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+              examples:
+                subscription_list:
+                  value:
+                    - id: "550e8400-e29b-41d4-a716-446655440000"
+                      protocol: HTTP
+                      sink: "https://application-server.com/notifications"
+                      types:
+                        - org.camaraproject.esim-profile-management.v0.operation-completed
+                      config:
+                        subscriptionDetail:
+                          esimProfile:
+                            eid: "89049032000000000000000000000001"
+                      startsAt: "2024-01-15T10:00:00Z"
+                      expiresAt: "2024-12-31T23:59:59Z"
+                      status: ACTIVE
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - Event Subscriptions
+      summary: Retrieve event subscription
+      description: |
+        Retrieves details of a specific event subscription.
+      operationId: getSubscription
+      security:
+        - openId:
+            - esim-profile-management-subscriptions:read
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Subscription identifier
+      responses:
+        '200':
+          description: Subscription retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+              examples:
+                subscription_details:
+                  value:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    protocol: HTTP
+                    sink: "https://application-server.com/notifications"
+                    types:
+                      - org.camaraproject.esim-profile-management.v0.operation-completed
+                    config:
+                      subscriptionDetail:
+                        esimProfile:
+                          eid: "89049032000000000000000000000001"
+                    startsAt: "2024-01-15T10:00:00Z"
+                    expiresAt: "2024-12-31T23:59:59Z"
+                    status: ACTIVE
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+
+    delete:
+      tags:
+        - Event Subscriptions
+      summary: Delete event subscription
+      description: |
+        Deletes an event subscription. Can be handled synchronously (204) or asynchronously (202).
+      operationId: deleteSubscription
+      security:
+        - openId:
+            - esim-profile-management-subscriptions:delete
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Subscription identifier
+      responses:
+        '202':
+          description: Subscription deletion request accepted (asynchronous)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '204':
+          description: Subscription deleted successfully
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+
+components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid_configuration
+      description: OpenID Connect authentication
+
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+
+  schemas:
+    XCorrelator:
+      type: string
+      pattern: ^[a-zA-Z0-9-_:;.\\/<>{}]{0,256}$
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+      description: Correlation identifier
+
+    SubscriptionEventType:
+      type: string
+      enum:
+        - org.camaraproject.esim-profile-management.v0.operation-completed
+      description: Event type for eSIM Profile Management operations
+
+    Protocol:
+      type: string
+      enum:
+        - HTTP
+      description: Protocol for event notification delivery (only HTTP supported)
+
+    SubscriptionStatus:
+      type: string
+      enum:
+        - ACTIVATION_REQUESTED
+        - ACTIVE
+        - INACTIVE
+        - EXPIRED
+        - DELETED
+      description: |
+        Current status of the subscription:
+        - ACTIVATION_REQUESTED: Subscription creation in progress
+        - ACTIVE: Subscription is active and sending notifications
+        - INACTIVE: Subscription temporarily inactive
+        - EXPIRED: Subscription ended due to expiration or max events reached
+        - DELETED: Subscription deleted by user
+
+    ESimProfileFilter:
+      type: object
+      description: |
+        eSIM Profile filter for subscription. Provide one of:
+        - eid: Subscribe to all operations for all profiles on a device
+        - iccid: Subscribe to operations for a specific profile
+      properties:
+        eid:
+          type: string
+          pattern: '^[0-9]{32}$'
+          description: Subscribe to all profiles on this device (eUICC)
+          example: "89049032000000000000000000000001"
+        iccid:
+          type: string
+          pattern: '^[0-9]{19,20}$'
+          description: Subscribe to a specific eSIM Profile
+          example: "8901260123456789012"
+
+    OperationIdentifier:
+      type: object
+      description: Operation identifier for subscription filtering
+      properties:
+        operationId:
+          type: string
+          format: uuid
+          description: Specific operation ID to subscribe to
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      required:
+        - operationId
+
+    SubscriptionDetail:
+      type: object
+      description: |
+        Subscription filtering criteria. At least one filter must be provided.
+        - esimProfile: Filter by eSIM Profile(s) or device (EID)
+        - operation: Subscribe to a specific operation (by operationId)
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileFilter'
+        operation:
+          $ref: '#/components/schemas/OperationIdentifier'
+      minProperties: 1
+
+    SubscriptionConfig:
+      type: object
+      description: Subscription configuration parameters
+      properties:
+        subscriptionDetail:
+          $ref: '#/components/schemas/SubscriptionDetail'
+        subscriptionMaxEvents:
+          type: integer
+          minimum: 1
+          description: Maximum number of event notifications (subscription ends when reached)
+          example: 10
+        subscriptionExpireTime:
+          type: string
+          format: date-time
+          description: Subscription expiration time (RFC 3339 with timezone)
+          example: "2024-12-31T23:59:59Z"
+        initialEvent:
+          type: boolean
+          default: false
+          description: |
+            If true, send an immediate notification if the current state matches the subscription criteria.
+            For example, if subscribing to operation-completed events and an operation has already completed.
+      required:
+        - subscriptionDetail
+
+    SinkCredential:
+      type: object
+      description: Credentials for authenticating notifications to the sink endpoint
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - ACCESSTOKEN
+          description: Type of credential (only ACCESSTOKEN supported)
+        accessToken:
+          type: string
+          description: Access token for authenticating notification requests
+        accessTokenExpiresUtc:
+          type: string
+          format: date-time
+          description: |
+            Absolute UTC timestamp when the access token expires.
+            Implementation SHOULD send ACCESS_TOKEN_EXPIRED termination event before this time.
+        accessTokenType:
+          type: string
+          enum:
+            - bearer
+          description: Type of access token (only bearer supported)
+      required:
+        - credentialType
+        - accessToken
+        - accessTokenExpiresUtc
+        - accessTokenType
+
+    CreateSubscriptionRequest:
+      type: object
+      description: Request to create an event subscription
+      properties:
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        sink:
+          type: string
+          format: uri
+          description: HTTPS URL where notifications will be sent
+          example: "https://application-server.com/notifications"
+        sinkCredential:
+          $ref: '#/components/schemas/SinkCredential'
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionEventType'
+          minItems: 1
+          description: Event types to subscribe to
+        config:
+          $ref: '#/components/schemas/SubscriptionConfig'
+      required:
+        - protocol
+        - sink
+        - types
+        - config
+
+    Subscription:
+      type: object
+      description: Event subscription resource
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique subscription identifier
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        sink:
+          type: string
+          format: uri
+          description: HTTPS URL where notifications are sent
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionEventType'
+          description: Event types subscribed to
+        config:
+          $ref: '#/components/schemas/SubscriptionConfig'
+        startsAt:
+          type: string
+          format: date-time
+          description: Subscription start time
+        expiresAt:
+          type: string
+          format: date-time
+          description: Subscription expiration time (if applicable)
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+      required:
+        - id
+        - protocol
+        - sink
+        - types
+        - config
+        - startsAt
+
+    CloudEvent:
+      type: object
+      description: CloudEvents specification v1.0 compliant event
+      properties:
+        id:
+          type: string
+          description: Unique event identifier
+        source:
+          type: string
+          format: uri-reference
+          description: Context in which the event occurred
+        type:
+          $ref: '#/components/schemas/SubscriptionEventType'
+        specversion:
+          type: string
+          enum:
+            - "1.0"
+          description: CloudEvents specification version
+        datacontenttype:
+          type: string
+          enum:
+            - application/json
+          description: Content type of the data payload
+        time:
+          type: string
+          format: date-time
+          description: Timestamp when the event occurred (RFC 3339)
+        data:
+          type: object
+          description: Event-specific data payload
+      required:
+        - id
+        - source
+        - type
+        - specversion
+        - time
+
+    OperationCompletedEventData:
+      type: object
+      description: Event data for operation-completed events
+      properties:
+        subscriptionId:
+          type: string
+          format: uuid
+          description: Subscription that triggered this notification
+        operationId:
+          type: string
+          format: uuid
+          description: Operation identifier
+        operation:
+          type: string
+          enum:
+            - download
+            - enable
+            - disable
+            - delete
+            - set-fallback
+          description: Type of operation
+        status:
+          type: string
+          enum:
+            - completed
+            - failed
+          description: Operation outcome
+        esimProfile:
+          type: object
+          properties:
+            eid:
+              type: string
+              pattern: '^[0-9]{32}$'
+              description: eUICC Identifier
+            iccid:
+              type: string
+              pattern: '^[0-9]{19,20}$'
+              description: eSIM Profile ICCID
+          description: eSIM Profile involved in the operation
+        result:
+          type: object
+          description: Operation result details (when successful)
+          properties:
+            completedAt:
+              type: string
+              format: date-time
+              description: Operation completion timestamp
+            outcome:
+              type: string
+              description: Operation outcome description
+        error:
+          $ref: '#/components/schemas/ErrorInfo'
+      required:
+        - subscriptionId
+        - operationId
+        - operation
+        - status
+        - esimProfile
+
+    SubscriptionEndedEventData:
+      type: object
+      description: Event data for subscription-ended events
+      properties:
+        subscriptionId:
+          type: string
+          format: uuid
+          description: Subscription identifier
+        esimProfile:
+          type: object
+          description: eSIM Profile filter that was subscribed to
+          properties:
+            eid:
+              type: string
+              pattern: '^[0-9]{32}$'
+            iccid:
+              type: string
+              pattern: '^[0-9]{19,20}$'
+        terminationReason:
+          type: string
+          enum:
+            - NETWORK_TERMINATED
+            - SUBSCRIPTION_EXPIRED
+            - MAX_EVENTS_REACHED
+            - ACCESS_TOKEN_EXPIRED
+            - SUBSCRIPTION_DELETED
+          description: Reason for subscription termination
+      required:
+        - subscriptionId
+        - terminationReason
+
+    ErrorInfo:
+      type: object
+      description: Error information
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+      required:
+        - status
+        - code
+        - message
+
+  responses:
+    Generic400:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            INVALID_ARGUMENT:
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+
+    Generic401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            UNAUTHENTICATED:
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials.
+
+    Generic403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            PERMISSION_DENIED:
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+
+    Generic404:
+      description: Not Found
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            NOT_FOUND:
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            CONFLICT:
+              value:
+                status: 409
+                code: CONFLICT
+                message: A subscription with the same criteria already exists.
+
+    Generic422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            MISSING_IDENTIFIER:
+              value:
+                status: 422
+                code: MISSING_IDENTIFIER
+                message: Required identifier is missing from subscription detail.
+
+    Generic429:
+      description: Too Many Requests
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          examples:
+            RATE_LIMIT_EXCEEDED:
+              value:
+                status: 429
+                code: RATE_LIMIT_EXCEEDED
+                message: Too many requests. Please retry after some time.
