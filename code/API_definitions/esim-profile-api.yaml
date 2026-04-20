@@ -110,7 +110,6 @@ paths:
                     eid: "89049032000000000000000000000001"
                     iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
-                  sink: "https://webhook.example.com/esim-notifications"
               download_and_activate:
                 summary: Download and automatically enable
                 value:
@@ -119,31 +118,6 @@ paths:
                     iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
                   activateOnDownload: true
-                  sink: "https://webhook.example.com/esim-notifications"
-      callbacks:
-        operationStatus:
-          '{$request.body#/sink}':
-            post:
-              summary: eSIM operation completed notification
-              description: |
-                Important: this endpoint is to be implemented by the API consumer.
-                It will be called when any eSIM operation completes (success or failure).
-                Events are sent regardless of operation outcome.
-              requestBody:
-                required: true
-                content:
-                  application/cloudevents+json:
-                    schema:
-                      $ref: '#/components/schemas/EsimProfileCloudEvent'
-                    examples:
-                      ESIM_PROFILE_DOWNLOAD_COMPLETED:
-                        $ref: '#/components/examples/ESIM_PROFILE_DOWNLOAD_COMPLETED'
-              responses:
-                '204':
-                  description: Callback received successfully
-              security:
-                - {}
-                - notificationsBearerAuth: []
       responses:
         '202':
           description: Download request accepted
@@ -199,31 +173,6 @@ paths:
                 value:
                   esimProfile:
                     iccid: "8901260123456789012"
-                  sink: "https://webhook.example.com/esim-notifications"
-      callbacks:
-        operationStatus:
-          '{$request.body#/sink}':
-            post:
-              summary: eSIM operation completed notification
-              description: |
-                Important: this endpoint is to be implemented by the API consumer.
-                It will be called when any eSIM operation completes (success or failure).
-                Events are sent regardless of operation outcome.
-              requestBody:
-                required: true
-                content:
-                  application/cloudevents+json:
-                    schema:
-                      $ref: '#/components/schemas/EsimProfileCloudEvent'
-                    examples:
-                      ESIM_PROFILE_ENABLE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_PROFILE_ENABLE_COMPLETED'
-              responses:
-                '204':
-                  description: Callback received successfully
-              security:
-                - {}
-                - notificationsBearerAuth: []
       responses:
         '202':
           description: Enable request accepted
@@ -277,31 +226,6 @@ paths:
                 value:
                   esimProfile:
                     iccid: "8901260123456789012"
-                  sink: "https://webhook.example.com/esim-notifications"
-      callbacks:
-        operationStatus:
-          '{$request.body#/sink}':
-            post:
-              summary: eSIM operation completed notification
-              description: |
-                Important: this endpoint is to be implemented by the API consumer.
-                It will be called when any eSIM operation completes (success or failure).
-                Events are sent regardless of operation outcome.
-              requestBody:
-                required: true
-                content:
-                  application/cloudevents+json:
-                    schema:
-                      $ref: '#/components/schemas/EsimProfileCloudEvent'
-                    examples:
-                      ESIM_PROFILE_DISABLE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_PROFILE_DISABLE_COMPLETED'
-              responses:
-                '204':
-                  description: Callback received successfully
-              security:
-                - {}
-                - notificationsBearerAuth: []
       responses:
         '202':
           description: Disable request accepted
@@ -355,31 +279,6 @@ paths:
                 value:
                   esimProfile:
                     iccid: "8901260123456789012"
-                  sink: "https://webhook.example.com/esim-notifications"
-      callbacks:
-        operationStatus:
-          '{$request.body#/sink}':
-            post:
-              summary: eSIM operation completed notification
-              description: |
-                Important: this endpoint is to be implemented by the API consumer.
-                It will be called when any eSIM operation completes (success or failure).
-                Events are sent regardless of operation outcome.
-              requestBody:
-                required: true
-                content:
-                  application/cloudevents+json:
-                    schema:
-                      $ref: '#/components/schemas/EsimProfileCloudEvent'
-                    examples:
-                      ESIM_PROFILE_DELETE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_PROFILE_DELETE_COMPLETED'
-              responses:
-                '204':
-                  description: Callback received successfully
-              security:
-                - {}
-                - notificationsBearerAuth: []
       responses:
         '202':
           description: Delete request accepted
@@ -433,31 +332,6 @@ paths:
                 value:
                   esimProfile:
                     iccid: "8901260123456789013"
-                  sink: "https://webhook.example.com/esim-notifications"
-      callbacks:
-        operationStatus:
-          '{$request.body#/sink}':
-            post:
-              summary: eSIM operation completed notification
-              description: |
-                Important: this endpoint is to be implemented by the API consumer.
-                It will be called when any eSIM operation completes (success or failure).
-                Events are sent regardless of operation outcome.
-              requestBody:
-                required: true
-                content:
-                  application/cloudevents+json:
-                    schema:
-                      $ref: '#/components/schemas/EsimProfileCloudEvent'
-                    examples:
-                      ESIM_PROFILE_SET_FALLBACK_COMPLETED:
-                        $ref: '#/components/examples/ESIM_PROFILE_SET_FALLBACK_COMPLETED'
-              responses:
-                '204':
-                  description: Callback received successfully
-              security:
-                - {}
-                - notificationsBearerAuth: []
       responses:
         '202':
           description: Set fallback request accepted
@@ -597,10 +471,6 @@ components:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid_configuration
       description: OpenID Connect authentication
-    notificationsBearerAuth:
-      type: http
-      scheme: bearer
-      description: Bearer token for callback authentication
 
   parameters:
     x-correlator:
@@ -681,19 +551,9 @@ components:
             Automatically enable the eSIM Profile after successful download.
             - false (default): eSIM Profile remains in disabled state after download
             - true: eSIM Profile is automatically enabled after download (only one eSIM Profile can be active per device)
-        sink:
-          type: string
-          format: uri
-          description: Callback URL for operation status notifications
-        sinkCredential:
-          $ref: '#/components/schemas/SinkCredential'
-        correlationId:
-          type: string
-          description: Client-provided correlation identifier
       required:
         - esimProfile
         - activationCode
-        - sink
 
     EnableEsimProfileRequest:
       type: object
@@ -701,18 +561,8 @@ components:
       properties:
         esimProfile:
           $ref: '#/components/schemas/ESimProfileForOperation'
-        sink:
-          type: string
-          format: uri
-          description: Callback URL for operation status notifications
-        sinkCredential:
-          $ref: '#/components/schemas/SinkCredential'
-        correlationId:
-          type: string
-          description: Client-provided correlation identifier
       required:
         - esimProfile
-        - sink
 
     DisableEsimProfileRequest:
       type: object
@@ -720,18 +570,8 @@ components:
       properties:
         esimProfile:
           $ref: '#/components/schemas/ESimProfileForOperation'
-        sink:
-          type: string
-          format: uri
-          description: Callback URL for operation status notifications
-        sinkCredential:
-          $ref: '#/components/schemas/SinkCredential'
-        correlationId:
-          type: string
-          description: Client-provided correlation identifier
       required:
         - esimProfile
-        - sink
 
     DeleteEsimProfileRequest:
       type: object
@@ -739,18 +579,8 @@ components:
       properties:
         esimProfile:
           $ref: '#/components/schemas/ESimProfileForOperation'
-        sink:
-          type: string
-          format: uri
-          description: Callback URL for operation status notifications
-        sinkCredential:
-          $ref: '#/components/schemas/SinkCredential'
-        correlationId:
-          type: string
-          description: Client-provided correlation identifier
       required:
         - esimProfile
-        - sink
 
     SetFallbackEsimProfileRequest:
       type: object
@@ -758,18 +588,8 @@ components:
       properties:
         esimProfile:
           $ref: '#/components/schemas/ESimProfileForOperation'
-        sink:
-          type: string
-          format: uri
-          description: Callback URL for operation status notifications
-        sinkCredential:
-          $ref: '#/components/schemas/SinkCredential'
-        correlationId:
-          type: string
-          description: Client-provided correlation identifier
       required:
         - esimProfile
-        - sink
 
     QueryEsimProfileStatusRequest:
       type: object
@@ -835,179 +655,6 @@ components:
           description: All eSIM Profiles available on the device
       required:
         - esimProfiles
-
-    SinkCredential:
-      type: object
-      properties:
-        credentialType:
-          type: string
-          enum:
-            - PLAIN
-            - ACCESSTOKEN
-            - REFRESHTOKEN
-      discriminator:
-        propertyName: credentialType
-        mapping:
-          PLAIN: '#/components/schemas/PlainCredential'
-          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
-          REFRESHTOKEN: '#/components/schemas/RefreshTokenCredential'
-      required:
-        - credentialType
-
-    PlainCredential:
-      type: object
-      description: A plain credential as a combination of an identifier and a secret.
-      allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          required:
-            - identifier
-            - secret
-          properties:
-            identifier:
-              description: The identifier might be an account or username.
-              type: string
-            secret:
-              description: The secret might be a password or passphrase.
-              type: string
-
-    AccessTokenCredential:
-      type: object
-      description: An access token credential.
-      allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          properties:
-            accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
-              type: string
-            accessTokenExpiresUtc:
-              type: string
-              format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
-            accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
-              type: string
-              enum:
-                - bearer
-          required:
-            - accessToken
-            - accessTokenExpiresUtc
-            - accessTokenType
-
-    RefreshTokenCredential:
-      type: object
-      description: An access token credential with a refresh token.
-      allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          properties:
-            accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
-              type: string
-            accessTokenExpiresUtc:
-              type: string
-              format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
-            accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
-              type: string
-              enum:
-                - bearer
-            refreshToken:
-              description: REQUIRED. An refresh token credential used to acquire access tokens.
-              type: string
-            refreshTokenEndpoint:
-              type: string
-              format: uri
-              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
-      required:
-        - accessToken
-        - accessTokenExpiresUtc
-        - accessTokenType
-        - refreshToken
-        - refreshTokenEndpoint
-
-
-    CloudEvent:
-      type: object
-      description: Event compliant with the CloudEvents specification
-      required:
-        - id
-        - source
-        - specversion
-        - type
-        - time
-      properties:
-        id:
-          description: Identifier of this event, that must be unique in the source context.
-          type: string
-        source:
-          description: Identifies the context in which an event happened in the specific Provider Implementation.
-          type: string
-          format: uri-reference
-        type:
-          description: The type of the event.
-          type: string
-        specversion:
-          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
-          type: string
-          enum:
-            - '1.0'
-        datacontenttype:
-          description: 'media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs'
-          type: string
-          enum:
-            - 'application/json'
-        data:
-          description: Event notification details payload, which depends on the event type
-          type: object
-        time:
-          description: |
-            Timestamp of when the occurrence happened. It must follow RFC 3339
-          type: string
-          format: date-time
-
-    EsimProfileCloudEvent:
-      description: CloudEvent for eSIM Profile operations
-      allOf:
-        - $ref: '#/components/schemas/CloudEvent'
-        - type: object
-          properties:
-            type:
-              enum:
-                - com.camara.esim-profile-management.vwip.operation-completed
-            data:
-              $ref: '#/components/schemas/EsimProfileEventData'
-
-    EsimProfileEventData:
-      type: object
-      description: Event data for eSIM Profile operations
-      properties:
-        operationId:
-          type: string
-          format: uuid
-          description: Operation identifier
-        operation:
-          type: string
-          enum: [download, enable, disable, delete, set-fallback]
-          description: Operation type
-        status:
-          type: string
-          enum: [completed]
-          description: Operation status (always completed for callbacks)
-        esimProfile:
-          $ref: '#/components/schemas/ESimProfile'
-        result:
-          type: object
-          description: Operation result details (when completed/failed)
-        error:
-          $ref: '#/components/schemas/ErrorInfo'
-      required:
-        - operationId
-        - operation
-        - status
-        - esimProfile
 
     ErrorInfo:
       type: object
@@ -1166,105 +813,3 @@ components:
                 status: 422
                 code: MISSING_IDENTIFIER
                 message: The device cannot be identified.
-
-  examples:
-    ESIM_PROFILE_DOWNLOAD_COMPLETED:
-      summary: eSIM Profile download operation completed
-      description: Callback event for completed download operation
-      value:
-        specversion: "1.0"
-        type: "com.camara.esim-profile-management.vwip.operation-completed"
-        source: "https://api.example.com/esim-profile-management/vwip"
-        id: "550e8400-e29b-41d4-a716-446655440000"
-        time: "2024-01-15T10:30:00Z"
-        data:
-          operationId: "550e8400-e29b-41d4-a716-446655440000"
-          operation: "download"
-          status: "completed"
-          esimProfile:
-            eid: "89049032000000000000000000000001"
-            iccid: "8901260123456789012"
-          result:
-            outcome: "success"
-            completedAt: "2024-01-15T10:30:00Z"
-
-    ESIM_PROFILE_ENABLE_COMPLETED:
-      summary: eSIM Profile enable operation completed
-      description: Callback event for completed enable operation
-      value:
-        specversion: "1.0"
-        type: "com.camara.esim-profile-management.vwip.operation-completed"
-        source: "https://api.example.com/esim-profile-management/vwip"
-        id: "550e8400-e29b-41d4-a716-446655440001"
-        time: "2024-01-15T10:35:00Z"
-        data:
-          operationId: "550e8400-e29b-41d4-a716-446655440001"
-          operation: "enable"
-          status: "completed"
-          esimProfile:
-            eid: "89049032000000000000000000000001"
-            iccid: "8901260123456789012"
-          result:
-            outcome: "success"
-            completedAt: "2024-01-15T10:35:00Z"
-
-    ESIM_PROFILE_DISABLE_COMPLETED:
-      summary: eSIM Profile disable operation completed (failed)
-      description: Callback event for completed disable operation
-      value:
-        specversion: "1.0"
-        type: "com.camara.esim-profile-management.vwip.operation-completed"
-        source: "https://api.example.com/esim-profile-management/vwip"
-        id: "550e8400-e29b-41d4-a716-446655440002"
-        time: "2024-01-15T10:40:00Z"
-        data:
-          operationId: "550e8400-e29b-41d4-a716-446655440002"
-          operation: "disable"
-          status: "completed"
-          esimProfile:
-            eid: "89049032000000000000000000000001"
-            iccid: "8901260123456789012"
-          error:
-            status: 422
-            code: "ESIM_PROFILE_NOT_ENABLED"
-            message: "eSIM Profile is not currently enabled"
-
-    ESIM_PROFILE_DELETE_COMPLETED:
-      summary: eSIM Profile delete operation completed
-      description: Callback event for completed delete operation
-      value:
-        specversion: "1.0"
-        type: "com.camara.esim-profile-management.vwip.operation-completed"
-        source: "https://api.example.com/esim-profile-management/vwip"
-        id: "550e8400-e29b-41d4-a716-446655440003"
-        time: "2024-01-15T10:45:00Z"
-        data:
-          operationId: "550e8400-e29b-41d4-a716-446655440003"
-          operation: "delete"
-          status: "completed"
-          esimProfile:
-            eid: "89049032000000000000000000000001"
-            iccid: "8901260123456789012"
-          result:
-            outcome: "success"
-            completedAt: "2024-01-15T10:45:00Z"
-
-    ESIM_PROFILE_SET_FALLBACK_COMPLETED:
-      summary: eSIM Profile set-fallback operation completed
-      description: Callback event for completed set-fallback operation
-      value:
-        specversion: "1.0"
-        type: "com.camara.esim-profile-management.vwip.operation-completed"
-        source: "https://api.example.com/esim-profile-management/vwip"
-        id: "550e8400-e29b-41d4-a716-446655440004"
-        time: "2024-01-15T10:50:00Z"
-        data:
-          operationId: "550e8400-e29b-41d4-a716-446655440004"
-          operation: "set-fallback"
-          status: "completed"
-          esimProfile:
-            eid: "89049032000000000000000000000001"
-            iccid: "8901260123456789013"
-          result:
-            outcome: "success"
-            completedAt: "2024-01-15T10:50:00Z"
