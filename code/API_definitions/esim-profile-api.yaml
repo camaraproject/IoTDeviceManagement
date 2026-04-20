@@ -1,24 +1,24 @@
 openapi: 3.0.3
 info:
-  title: eSIM Management API
+  title: eSIM Profile Management API
   description: |
-    CAMARA eSIM Management API v0.1 - Developer-friendly eSIM APIs
+    CAMARA eSIM Profile Management API v0.1 - Developer-friendly eSIM Profile APIs
 
     # Introduction
 
-    eSIM (embedded SIM) technology allows remote provisioning and management of cellular connectivity without physical SIM card replacement. The CAMARA eSIM Management API provides a unified interface for eSIM lifecycle operations including download, enable, disable, delete, and fallback configuration.
+    eSIM (embedded SIM) technology allows remote provisioning and management of cellular connectivity without physical SIM card replacement. The CAMARA eSIM Profile Management API provides a unified interface for eSIM Profile lifecycle operations including download, enable, disable, delete, and fallback configuration.
 
-    The target of the eSIM operations is typically the eUICC on the device (as opposed to the cellular network).
+    The target of the eSIM Profile operations is typically the eUICC on the device (as opposed to the cellular network).
 
-    **Terminology Note**: In this API, "eSIM" and "eSIM profile" refer to the same thing - downloadable connectivity configurations installed on eSIM hardware. We use "eSIM" for simplicity.
+    **Terminology Note**: In this API, "eSIM Profile" refers to downloadable connectivity configurations installed on eSIM hardware (eUICC). "eSIM" refers to the hardware itself.
 
     **Key roles**
 
     | **Role Name** | **Description** |
     | ---- | ------- |
-    | API Consumer | The entity that consumes the eSIM Management APIs |
-    | API Provider | The entity that provides the eSIM Management APIs |
-    | Network Provider | The entity that provides the physical network resources and eSIM platform |
+    | API Consumer | The entity that consumes the eSIM Profile Management APIs |
+    | API Provider | The entity that provides the eSIM Profile Management APIs |
+    | Network Provider | The entity that provides the physical network resources and eSIM Profile platform |
     | Device Owner | The entity that owns or manages the devices containing eSIM hardware |
 
     ## Operation-Specific Identification
@@ -64,36 +64,36 @@ info:
   x-camara-commonalities: 0.6
 
 servers:
-  - url: "{apiRoot}/esim/vwip"
+  - url: "{apiRoot}/esim-profile-management/vwip"
     variables:
       apiRoot:
         default: http://localhost:9091
         description: API root, defined by the service provider
 
 tags:
-  - name: eSIM Operations
+  - name: eSIM Profile Operations
     description: Lifecycle management operations for eSIM profiles
 
 paths:
-  /esim/download:
+  /esim-profile-management/download:
     post:
       tags:
-        - eSIM Operations
-      summary: Download eSIM to device
+        - eSIM Profile Operations
+      summary: Download eSIM Profile to device
       description: |
-        Downloads and installs an eSIM profile to a device. By default, the eSIM will be in disabled state after successful download and ready for enabling. Optionally, the eSIM can be automatically enabled after download.
+        Downloads and installs an eSIM Profile to a device. By default, the eSIM Profile will be in disabled state after successful download and ready for enabling. Optionally, the eSIM Profile can be automatically enabled after download.
 
-        **eSIM Identification**: Requires both EID and ICCID plus activationCode.
+        **eSIM Profile Identification**: Requires both EID and ICCID plus activationCode.
 
         **State Transition**:
         - Default: None → Disabled
         - With activateOnDownload=true: None → Enabled
 
         **Required**: EID + ICCID + activationCode
-      operationId: downloadEsim
+      operationId: downloadEsimProfile
       security:
         - openId:
-            - iot-device-management:esims:download
+            - iot-device-management:esim-profiles:download
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -101,12 +101,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DownloadEsimRequest'
+              $ref: '#/components/schemas/DownloadEsimProfileRequest'
             examples:
               download_example:
-                summary: Download eSIM profile to device
+                summary: Download eSIM Profile to device
                 value:
-                  esim:
+                  esimProfile:
                     eid: "89049032000000000000000000000001"
                     iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
@@ -114,7 +114,7 @@ paths:
               download_and_activate:
                 summary: Download and automatically enable
                 value:
-                  esim:
+                  esimProfile:
                     eid: "89049032000000000000000000000001"
                     iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
@@ -134,10 +134,10 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: '#/components/schemas/EsimCloudEvent'
+                      $ref: '#/components/schemas/EsimProfileCloudEvent'
                     examples:
-                      ESIM_DOWNLOAD_COMPLETED:
-                        $ref: '#/components/examples/ESIM_DOWNLOAD_COMPLETED'
+                      ESIM_PROFILE_DOWNLOAD_COMPLETED:
+                        $ref: '#/components/examples/ESIM_PROFILE_DOWNLOAD_COMPLETED'
               responses:
                 '204':
                   description: Callback received successfully
@@ -150,14 +150,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 download_accepted:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440000"
                     operation: "download"
                     status: "accepted"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
@@ -169,22 +169,22 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim/enable:
+  /esim-profile-management/enable:
     post:
       tags:
-        - eSIM Operations
-      summary: Enable eSIM
+        - eSIM Profile Operations
+      summary: Enable eSIM Profile
       description: |
-        Enables an eSIM for cellular connectivity provided valid connectivity services are configured in the eSIM and the network. Only one eSIM can be enabled per eUICC on the device - enabling automatically disables the currently active eSIM.
+        Enables an eSIM Profile for cellular connectivity provided valid connectivity services are configured in the eSIM Profile and the network. Only one eSIM Profile can be enabled per eUICC on the device - enabling automatically disables the currently active eSIM Profile.
 
-        **eSIM Identification**: Uses ICCID to identify the profile.
+        **eSIM Profile Identification**: Uses ICCID to identify the profile.
 
         **State Transition**: Disabled → Enabled
         **Required**: ICCID
-      operationId: enableEsim
+      operationId: enableEsimProfile
       security:
         - openId:
-            - iot-device-management:esims:enable
+            - iot-device-management:esim-profiles:enable
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -192,12 +192,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EnableEsimRequest'
+              $ref: '#/components/schemas/EnableEsimProfileRequest'
             examples:
               enable_profile:
-                summary: Enable profile
+                summary: Enable eSIM Profile
                 value:
-                  esim:
+                  esimProfile:
                     iccid: "8901260123456789012"
                   sink: "https://webhook.example.com/esim-notifications"
       callbacks:
@@ -214,10 +214,10 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: '#/components/schemas/EsimCloudEvent'
+                      $ref: '#/components/schemas/EsimProfileCloudEvent'
                     examples:
-                      ESIM_ENABLE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_ENABLE_COMPLETED'
+                      ESIM_PROFILE_ENABLE_COMPLETED:
+                        $ref: '#/components/examples/ESIM_PROFILE_ENABLE_COMPLETED'
               responses:
                 '204':
                   description: Callback received successfully
@@ -230,14 +230,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 enable_accepted:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440001"
                     operation: "enable"
                     status: "accepted"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
@@ -249,20 +249,20 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim/disable:
+  /esim-profile-management/disable:
     post:
       tags:
-        - eSIM Operations
-      summary: Disable eSIM
+        - eSIM Profile Operations
+      summary: Disable eSIM Profile
       description: |
-        Disables the currently enabled eSIM. Device will lose cellular connectivity until another eSIM is enabled. The eSIM remains installed and can be re-enabled.
+        Disables the currently enabled eSIM Profile. Device will lose cellular connectivity until another eSIM Profile is enabled. The eSIM Profile remains installed and can be re-enabled.
 
         **State Transition**: Enabled → Disabled
-        **Required**: ICCID (identifies eSIM and device)
-      operationId: disableEsim
+        **Required**: ICCID (identifies eSIM Profile and device)
+      operationId: disableEsimProfile
       security:
         - openId:
-            - iot-device-management:esims:disable
+            - iot-device-management:esim-profiles:disable
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -270,12 +270,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DisableEsimRequest'
+              $ref: '#/components/schemas/DisableEsimProfileRequest'
             examples:
               disable_profile:
-                summary: Disable profile
+                summary: Disable eSIM Profile
                 value:
-                  esim:
+                  esimProfile:
                     iccid: "8901260123456789012"
                   sink: "https://webhook.example.com/esim-notifications"
       callbacks:
@@ -292,10 +292,10 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: '#/components/schemas/EsimCloudEvent'
+                      $ref: '#/components/schemas/EsimProfileCloudEvent'
                     examples:
-                      ESIM_DISABLE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_DISABLE_COMPLETED'
+                      ESIM_PROFILE_DISABLE_COMPLETED:
+                        $ref: '#/components/examples/ESIM_PROFILE_DISABLE_COMPLETED'
               responses:
                 '204':
                   description: Callback received successfully
@@ -308,14 +308,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 disable_accepted:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440002"
                     operation: "disable"
                     status: "accepted"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
@@ -327,20 +327,20 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim/delete:
+  /esim-profile-management/delete:
     post:
       tags:
-        - eSIM Operations
-      summary: Delete eSIM profile
+        - eSIM Profile Operations
+      summary: Delete eSIM Profile
       description: |
-        Permanently removes an eSIM profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in disabled state before deletion.
+        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in disabled state before deletion.
 
         **State Transition**: Disabled → Deleted (removed)
-        **Required**: ICCID (identifies eSIM and device)
-      operationId: deleteEsim
+        **Required**: ICCID (identifies eSIM Profile and device)
+      operationId: deleteEsimProfile
       security:
         - openId:
-            - iot-device-management:esims:delete
+            - iot-device-management:esim-profiles:delete
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -348,12 +348,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteEsimRequest'
+              $ref: '#/components/schemas/DeleteEsimProfileRequest'
             examples:
               delete_profile:
-                summary: Delete profile
+                summary: Delete eSIM Profile
                 value:
-                  esim:
+                  esimProfile:
                     iccid: "8901260123456789012"
                   sink: "https://webhook.example.com/esim-notifications"
       callbacks:
@@ -370,10 +370,10 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: '#/components/schemas/EsimCloudEvent'
+                      $ref: '#/components/schemas/EsimProfileCloudEvent'
                     examples:
-                      ESIM_DELETE_COMPLETED:
-                        $ref: '#/components/examples/ESIM_DELETE_COMPLETED'
+                      ESIM_PROFILE_DELETE_COMPLETED:
+                        $ref: '#/components/examples/ESIM_PROFILE_DELETE_COMPLETED'
               responses:
                 '204':
                   description: Callback received successfully
@@ -386,14 +386,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 delete_accepted:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440003"
                     operation: "delete"
                     status: "accepted"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
@@ -405,20 +405,20 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim/set-fallback:
+  /esim-profile-management/set-fallback:
     post:
       tags:
-        - eSIM Operations
-      summary: Set fallback eSIM
+        - eSIM Profile Operations
+      summary: Set fallback eSIM Profile
       description: |
-        Configures an eSIM as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM must be in disabled state.
+        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in disabled state.
 
         **State Transition**: No state change (sets attribute only)
-        **Required**: ICCID (identifies eSIM to designate as fallback)
-      operationId: setFallbackEsim
+        **Required**: ICCID (identifies eSIM Profile to designate as fallback)
+      operationId: setFallbackEsimProfile
       security:
         - openId:
-            - iot-device-management:esims:enable
+            - iot-device-management:esim-profiles:enable
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -426,12 +426,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetFallbackEsimRequest'
+              $ref: '#/components/schemas/SetFallbackEsimProfileRequest'
             examples:
               set_fallback:
-                summary: Set profile as fallback
+                summary: Set eSIM Profile as fallback
                 value:
-                  esim:
+                  esimProfile:
                     iccid: "8901260123456789013"
                   sink: "https://webhook.example.com/esim-notifications"
       callbacks:
@@ -448,10 +448,10 @@ paths:
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: '#/components/schemas/EsimCloudEvent'
+                      $ref: '#/components/schemas/EsimProfileCloudEvent'
                     examples:
-                      ESIM_SET_FALLBACK_COMPLETED:
-                        $ref: '#/components/examples/ESIM_SET_FALLBACK_COMPLETED'
+                      ESIM_PROFILE_SET_FALLBACK_COMPLETED:
+                        $ref: '#/components/examples/ESIM_PROFILE_SET_FALLBACK_COMPLETED'
               responses:
                 '204':
                   description: Callback received successfully
@@ -464,14 +464,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 set_fallback_accepted:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440004"
                     operation: "set-fallback"
                     status: "accepted"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789013"
         '400':
@@ -483,47 +483,47 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim/retrieve-status:
+  /esim-profile-management/retrieve-status:
     post:
       tags:
-        - eSIM Operations
-      summary: Retrieve eSIM profile status
+        - eSIM Profile Operations
+      summary: Retrieve eSIM Profile status
       description: |
-        Retrieves current status and state information for eSIM profiles.
+        Retrieves current status and state information for eSIM Profiles.
 
-        **eSIM Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
-      operationId: getEsimStatus
+        **eSIM Profile Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
+      operationId: getEsimProfileStatus
       security:
         - openId:
-            - iot-device-management:esims:read
+            - iot-device-management:esim-profiles:read
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QueryEsimStatusRequest'
+              $ref: '#/components/schemas/QueryEsimProfileStatusRequest'
             examples:
               query_by_eid:
                 summary: Query status by EID
                 value:
-                  esim:
+                  esimProfile:
                     eid: "89049032000000000000000000000001"
               query_by_iccid:
                 summary: Query status by ICCID
                 value:
-                  esim:
+                  esimProfile:
                     iccid: "8901260123456789012"
       responses:
         '200':
-          description: eSIM status retrieved successfully
+          description: eSIM Profile status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EsimStatusResponse'
+                $ref: '#/components/schemas/EsimProfileStatusResponse'
               examples:
                 device_status:
                   value:
-                    esims:
+                    esimProfiles:
                       - eid: "89049032000000000000000000000001"
                         iccid: "8901260123456789012"
                         state: "enabled"
@@ -541,19 +541,19 @@ paths:
         '404':
           $ref: '#/components/responses/Generic404'
 
-  /esim/operations/{operationId}:
+  /esim-profile-management/operations/{operationId}:
     get:
       tags:
-        - eSIM Operations
+        - eSIM Profile Operations
       summary: Retrieve operation information
       description: |
-        Retrieves detailed information about an eSIM operation including status, results, and progress.
+        Retrieves detailed information about an eSIM Profile operation including status, results, and progress.
 
-        **Operation ID**: From any eSIM operation response
+        **Operation ID**: From any eSIM Profile operation response
       operationId: retrieveOperation
       security:
         - openId:
-            - iot-device-management:esims:read
+            - iot-device-management:esim-profiles:read
       parameters:
         - $ref: '#/components/parameters/x-correlator'
         - name: operationId
@@ -569,14 +569,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ESimResponse'
+                $ref: '#/components/schemas/ESimProfileResponse'
               examples:
                 operation_result:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440000"
                     operation: "download"
                     status: "completed"
-                    esim:
+                    esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
                     result:
@@ -617,59 +617,59 @@ components:
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
       description: Correlation identifier
 
-    # eSIM Identifier Schemas
-    ESimEid:
+    # eSIM Profile Identifier Schemas
+    ESimProfileEid:
       type: string
       pattern: '^[0-9]{32}$'
       description: eUICC Identifier (EID) - 32 decimal digits per SGP.22 v3.1 specification
       example: "89049032000000000000000000000001"
 
-    ESimIccid:
+    ESimProfileIccid:
       type: string
       pattern: '^[0-9]{19,20}$'
-      description: Integrated Circuit Card Identifier (ICCID) - eSIM profile identifier per ITU-T E.118
+      description: Integrated Circuit Card Identifier (ICCID) - eSIM Profile identifier per ITU-T E.118
       example: "8901260123456789012"
 
-    # eSIM Schema - Flexible identification
-    ESim:
+    # eSIM Profile Schema - Flexible identification
+    ESimProfile:
       type: object
       description: |
-        eSIM profile container with flexible identification.
+        eSIM Profile container with flexible identification.
         - EID: eUICC hardware identifier (device)
-        - ICCID: eSIM profile identifier (network subscription)
+        - ICCID: eSIM Profile identifier (network subscription)
         Operation-specific requirements are enforced by derived schemas.
       properties:
         eid:
-          $ref: '#/components/schemas/ESimEid'
+          $ref: '#/components/schemas/ESimProfileEid'
         iccid:
-          $ref: '#/components/schemas/ESimIccid'
+          $ref: '#/components/schemas/ESimProfileIccid'
 
-    ESimForDownload:
+    ESimProfileForDownload:
       allOf:
-        - $ref: '#/components/schemas/ESim'
+        - $ref: '#/components/schemas/ESimProfile'
         - required: [eid, iccid]
-      description: eSIM identification for download operations (requires both EID and ICCID)
+      description: eSIM Profile identification for download operations (requires both EID and ICCID)
 
-    ESimForOperation:
+    ESimProfileForOperation:
       allOf:
-        - $ref: '#/components/schemas/ESim'
+        - $ref: '#/components/schemas/ESimProfile'
         - required: [iccid]
-      description: eSIM identification for enable/disable/delete/set-fallback operations (requires only ICCID)
+      description: eSIM Profile identification for enable/disable/delete/set-fallback operations (requires only ICCID)
 
-    ESimForStatus:
+    ESimProfileForStatus:
       allOf:
-        - $ref: '#/components/schemas/ESim'
+        - $ref: '#/components/schemas/ESimProfile'
         - anyOf:
             - required: [eid]
             - required: [iccid]
-      description: eSIM identification for status operations (requires either EID or ICCID)
-    # Request schemas using new eSIM identification
-    DownloadEsimRequest:
+      description: eSIM Profile identification for status operations (requires either EID or ICCID)
+    # Request schemas using new eSIM Profile identification
+    DownloadEsimProfileRequest:
       type: object
-      description: Request to download eSIM profile
+      description: Request to download eSIM Profile
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForDownload'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForDownload'
         activationCode:
           type: string
           description: Profile activation code (LPA format)
@@ -678,9 +678,9 @@ components:
           type: boolean
           default: false
           description: |
-            Automatically enable the eSIM after successful download.
-            - false (default): eSIM remains in disabled state after download
-            - true: eSIM is automatically enabled after download (only one eSIM can be active per device)
+            Automatically enable the eSIM Profile after successful download.
+            - false (default): eSIM Profile remains in disabled state after download
+            - true: eSIM Profile is automatically enabled after download (only one eSIM Profile can be active per device)
         sink:
           type: string
           format: uri
@@ -691,16 +691,16 @@ components:
           type: string
           description: Client-provided correlation identifier
       required:
-        - esim
+        - esimProfile
         - activationCode
         - sink
 
-    EnableEsimRequest:
+    EnableEsimProfileRequest:
       type: object
-      description: Request to enable eSIM profile
+      description: Request to enable eSIM Profile
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForOperation'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
         sink:
           type: string
           format: uri
@@ -711,15 +711,15 @@ components:
           type: string
           description: Client-provided correlation identifier
       required:
-        - esim
+        - esimProfile
         - sink
 
-    DisableEsimRequest:
+    DisableEsimProfileRequest:
       type: object
-      description: Request to disable eSIM profile
+      description: Request to disable eSIM Profile
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForOperation'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
         sink:
           type: string
           format: uri
@@ -730,15 +730,15 @@ components:
           type: string
           description: Client-provided correlation identifier
       required:
-        - esim
+        - esimProfile
         - sink
 
-    DeleteEsimRequest:
+    DeleteEsimProfileRequest:
       type: object
-      description: Request to delete eSIM profile
+      description: Request to delete eSIM Profile
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForOperation'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
         sink:
           type: string
           format: uri
@@ -749,15 +749,15 @@ components:
           type: string
           description: Client-provided correlation identifier
       required:
-        - esim
+        - esimProfile
         - sink
 
-    SetFallbackEsimRequest:
+    SetFallbackEsimProfileRequest:
       type: object
-      description: Request to set eSIM as fallback
+      description: Request to set eSIM Profile as fallback
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForOperation'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
         sink:
           type: string
           format: uri
@@ -768,21 +768,21 @@ components:
           type: string
           description: Client-provided correlation identifier
       required:
-        - esim
+        - esimProfile
         - sink
 
-    QueryEsimStatusRequest:
+    QueryEsimProfileStatusRequest:
       type: object
-      description: Request to query eSIM status
+      description: Request to query eSIM Profile status
       properties:
-        esim:
-          $ref: '#/components/schemas/ESimForStatus'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForStatus'
       required:
-        - esim
+        - esimProfile
 
-    ESimResponse:
+    ESimProfileResponse:
       type: object
-      description: Unified response for all eSIM operations
+      description: Unified response for all eSIM Profile operations
       properties:
         operationId:
           type: string
@@ -796,8 +796,8 @@ components:
           type: string
           enum: [accepted, completed, failed]
           description: Current status of the operation
-        esim:
-          $ref: '#/components/schemas/ESim'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfile'
         result:
           type: object
           description: Operation-specific result data (when completed)
@@ -805,36 +805,36 @@ components:
         - operationId
         - operation
         - status
-        - esim
+        - esimProfile
 
-    EsimStatusResponse:
+    EsimProfileStatusResponse:
       type: object
-      description: Response containing eSIM status information
+      description: Response containing eSIM Profile status information
       properties:
-        esims:
+        esimProfiles:
           type: array
           items:
             type: object
             properties:
               eid:
-                $ref: '#/components/schemas/ESimEid'
+                $ref: '#/components/schemas/ESimProfileEid'
               iccid:
-                $ref: '#/components/schemas/ESimIccid'
+                $ref: '#/components/schemas/ESimProfileIccid'
               state:
                 type: string
                 enum: [enabled, disabled]
-                description: Current state of the eSIM profile
+                description: Current state of the eSIM Profile
               isFallback:
                 type: boolean
-                description: Whether this eSIM is designated as fallback
+                description: Whether this eSIM Profile is designated as fallback
             required:
               - eid
               - iccid
               - state
               - isFallback
-          description: All eSIM profiles available on the device
+          description: All eSIM Profiles available on the device
       required:
-        - esims
+        - esimProfiles
 
     SinkCredential:
       type: object
@@ -968,21 +968,21 @@ components:
           type: string
           format: date-time
 
-    EsimCloudEvent:
-      description: CloudEvent for eSIM operations
+    EsimProfileCloudEvent:
+      description: CloudEvent for eSIM Profile operations
       allOf:
         - $ref: '#/components/schemas/CloudEvent'
         - type: object
           properties:
             type:
               enum:
-                - com.camara.esim-management.vwip.operation-completed
+                - com.camara.esim-profile-management.vwip.operation-completed
             data:
-              $ref: '#/components/schemas/EsimEventData'
+              $ref: '#/components/schemas/EsimProfileEventData'
 
-    EsimEventData:
+    EsimProfileEventData:
       type: object
-      description: Event data for eSIM operations
+      description: Event data for eSIM Profile operations
       properties:
         operationId:
           type: string
@@ -996,8 +996,8 @@ components:
           type: string
           enum: [completed]
           description: Operation status (always completed for callbacks)
-        esim:
-          $ref: '#/components/schemas/ESim'
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfile'
         result:
           type: object
           description: Operation result details (when completed/failed)
@@ -1007,7 +1007,7 @@ components:
         - operationId
         - operation
         - status
-        - esim
+        - esimProfile
 
     ErrorInfo:
       type: object
@@ -1168,101 +1168,101 @@ components:
                 message: The device cannot be identified.
 
   examples:
-    ESIM_DOWNLOAD_COMPLETED:
-      summary: eSIM download operation completed
+    ESIM_PROFILE_DOWNLOAD_COMPLETED:
+      summary: eSIM Profile download operation completed
       description: Callback event for completed download operation
       value:
         specversion: "1.0"
-        type: "com.camara.esim-management.vwip.operation-completed"
-        source: "https://api.example.com/esim/vwip"
+        type: "com.camara.esim-profile-management.vwip.operation-completed"
+        source: "https://api.example.com/esim-profile-management/vwip"
         id: "550e8400-e29b-41d4-a716-446655440000"
         time: "2024-01-15T10:30:00Z"
         data:
           operationId: "550e8400-e29b-41d4-a716-446655440000"
           operation: "download"
           status: "completed"
-          esim:
+          esimProfile:
             eid: "89049032000000000000000000000001"
             iccid: "8901260123456789012"
           result:
             outcome: "success"
             completedAt: "2024-01-15T10:30:00Z"
 
-    ESIM_ENABLE_COMPLETED:
-      summary: eSIM enable operation completed
+    ESIM_PROFILE_ENABLE_COMPLETED:
+      summary: eSIM Profile enable operation completed
       description: Callback event for completed enable operation
       value:
         specversion: "1.0"
-        type: "com.camara.esim-management.vwip.operation-completed"
-        source: "https://api.example.com/esim/vwip"
+        type: "com.camara.esim-profile-management.vwip.operation-completed"
+        source: "https://api.example.com/esim-profile-management/vwip"
         id: "550e8400-e29b-41d4-a716-446655440001"
         time: "2024-01-15T10:35:00Z"
         data:
           operationId: "550e8400-e29b-41d4-a716-446655440001"
           operation: "enable"
           status: "completed"
-          esim:
+          esimProfile:
             eid: "89049032000000000000000000000001"
             iccid: "8901260123456789012"
           result:
             outcome: "success"
             completedAt: "2024-01-15T10:35:00Z"
 
-    ESIM_DISABLE_COMPLETED:
-      summary: eSIM disable operation completed (failed)
+    ESIM_PROFILE_DISABLE_COMPLETED:
+      summary: eSIM Profile disable operation completed (failed)
       description: Callback event for completed disable operation
       value:
         specversion: "1.0"
-        type: "com.camara.esim-management.vwip.operation-completed"
-        source: "https://api.example.com/esim/vwip"
+        type: "com.camara.esim-profile-management.vwip.operation-completed"
+        source: "https://api.example.com/esim-profile-management/vwip"
         id: "550e8400-e29b-41d4-a716-446655440002"
         time: "2024-01-15T10:40:00Z"
         data:
           operationId: "550e8400-e29b-41d4-a716-446655440002"
           operation: "disable"
           status: "completed"
-          esim:
+          esimProfile:
             eid: "89049032000000000000000000000001"
             iccid: "8901260123456789012"
           error:
             status: 422
-            code: "ESIM_NOT_ENABLED"
-            message: "eSIM profile is not currently enabled"
+            code: "ESIM_PROFILE_NOT_ENABLED"
+            message: "eSIM Profile is not currently enabled"
 
-    ESIM_DELETE_COMPLETED:
-      summary: eSIM delete operation completed
+    ESIM_PROFILE_DELETE_COMPLETED:
+      summary: eSIM Profile delete operation completed
       description: Callback event for completed delete operation
       value:
         specversion: "1.0"
-        type: "com.camara.esim-management.vwip.operation-completed"
-        source: "https://api.example.com/esim/vwip"
+        type: "com.camara.esim-profile-management.vwip.operation-completed"
+        source: "https://api.example.com/esim-profile-management/vwip"
         id: "550e8400-e29b-41d4-a716-446655440003"
         time: "2024-01-15T10:45:00Z"
         data:
           operationId: "550e8400-e29b-41d4-a716-446655440003"
           operation: "delete"
           status: "completed"
-          esim:
+          esimProfile:
             eid: "89049032000000000000000000000001"
             iccid: "8901260123456789012"
           result:
             outcome: "success"
             completedAt: "2024-01-15T10:45:00Z"
 
-    ESIM_SET_FALLBACK_COMPLETED:
-      summary: eSIM set-fallback operation completed
+    ESIM_PROFILE_SET_FALLBACK_COMPLETED:
+      summary: eSIM Profile set-fallback operation completed
       description: Callback event for completed set-fallback operation
       value:
         specversion: "1.0"
-        type: "com.camara.esim-management.vwip.operation-completed"
-        source: "https://api.example.com/esim/vwip"
+        type: "com.camara.esim-profile-management.vwip.operation-completed"
+        source: "https://api.example.com/esim-profile-management/vwip"
         id: "550e8400-e29b-41d4-a716-446655440004"
         time: "2024-01-15T10:50:00Z"
         data:
           operationId: "550e8400-e29b-41d4-a716-446655440004"
           operation: "set-fallback"
           status: "completed"
-          esim:
+          esimProfile:
             eid: "89049032000000000000000000000001"
             iccid: "8901260123456789013"
           result:
