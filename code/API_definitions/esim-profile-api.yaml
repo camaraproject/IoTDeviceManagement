@@ -23,7 +23,7 @@ info:
 
     ## Operation-Specific Identification
 
-    - **Download**: Requires both EID (target device) and ICCID (profile to install)
+    - **Download**: Requires EID (target device) and activationCode. ICCID is assigned during download and returned in response.
     - **Enable/Disable/Delete**: Requires only ICCID
     - **Set-Fallback**: Requires only ICCID
     - **Status**: Accepts either EID (all profiles on device) or ICCID (specific profile)
@@ -83,13 +83,13 @@ paths:
       description: |
         Downloads and installs an eSIM Profile to a device. By default, the eSIM Profile will be in disabled state after successful download and ready for enabling. Optionally, the eSIM Profile can be automatically enabled after download.
 
-        **eSIM Profile Identification**: Requires both EID and ICCID plus activationCode.
+        **eSIM Profile Identification**: Requires EID (target device) and activationCode. The ICCID will be assigned during the download process and returned in the response.
 
         **State Transition**:
         - Default: None → Disabled
         - With activateOnDownload=true: None → Enabled
 
-        **Required**: EID + ICCID + activationCode
+        **Required**: EID + activationCode
       operationId: downloadEsimProfile
       security:
         - openId:
@@ -108,14 +108,12 @@ paths:
                 value:
                   esimProfile:
                     eid: "89049032000000000000000000000001"
-                    iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
               download_and_activate:
                 summary: Download and automatically enable
                 value:
                   esimProfile:
                     eid: "89049032000000000000000000000001"
-                    iccid: "8901260123456789012"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
                   activateOnDownload: true
       responses:
@@ -517,8 +515,8 @@ components:
     ESimProfileForDownload:
       allOf:
         - $ref: '#/components/schemas/ESimProfile'
-        - required: [eid, iccid]
-      description: eSIM Profile identification for download operations (requires both EID and ICCID)
+        - required: [eid]
+      description: eSIM Profile identification for download operations (requires only EID, ICCID will be assigned during download)
 
     ESimProfileForOperation:
       allOf:
