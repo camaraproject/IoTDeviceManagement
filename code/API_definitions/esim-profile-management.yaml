@@ -30,11 +30,11 @@ info:
 
     # Operation Lifecycle
 
-    1. **Download**: Install eSIM profile to device. Optionally enable immediately.
-    2. **Enable**: Enable downloaded eSIM for connectivity (only one active per device)
-    3. **Disable**: Disable eSIM (device loses connectivity, eSIM remains installed)
-    4. **Delete**: Permanently remove eSIM from device (irreversible)
-    5. **Set-Fallback**: Configure backup eSIM for automatic failover
+    1. **Download**: Install eSIM Profile to device in disabled state.
+    2. **Enable**: Enable downloaded eSIM Profile for connectivity (only one active per device)
+    3. **Disable**: Disable eSIM Profile (device loses connectivity, eSIM Profile remains installed)
+    4. **Delete**: Permanently remove eSIM Profile from device (irreversible)
+    5. **Set-Fallback**: Configure backup eSIM Profile for automatic failover
 
     # States of eSIMs
 
@@ -81,13 +81,11 @@ paths:
         - eSIM Profile Operations
       summary: Download eSIM Profile to device
       description: |
-        Downloads and installs an eSIM Profile to a device. By default, the eSIM Profile will be in disabled state after successful download and ready for enabling. Optionally, the eSIM Profile can be automatically enabled after download.
+        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in disabled state after successful download and ready for enabling.
 
         **eSIM Profile Identification**: Requires EID (target device) and activationCode. The ICCID will be assigned during the download process and returned in the response.
 
-        **State Transition**:
-        - Default: None → Disabled
-        - With activateOnDownload=true: None → Enabled
+        **State Transition**: None → Disabled
 
         **Required**: EID + activationCode
       operationId: downloadEsimProfile
@@ -109,13 +107,6 @@ paths:
                   esimProfile:
                     eid: "89049032000000000000000000000001"
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
-              download_and_activate:
-                summary: Download and automatically enable
-                value:
-                  esimProfile:
-                    eid: "89049032000000000000000000000001"
-                  activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
-                  activateOnDownload: true
       responses:
         '202':
           description: Download request accepted
@@ -542,13 +533,6 @@ components:
           type: string
           description: Profile activation code (LPA format)
           example: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
-        activateOnDownload:
-          type: boolean
-          default: false
-          description: |
-            Automatically enable the eSIM Profile after successful download.
-            - false (default): eSIM Profile remains in disabled state after download
-            - true: eSIM Profile is automatically enabled after download (only one eSIM Profile can be active per device)
       required:
         - esimProfile
         - activationCode
