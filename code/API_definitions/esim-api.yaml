@@ -30,9 +30,9 @@ info:
 
     # Operation Lifecycle
 
-    1. **Download**: Install eSIM profile to device. Optionally activate immediately.
-    2. **Enable**: Activate downloaded eSIM for connectivity (only one active per device)
-    3. **Disable**: Deactivate eSIM (device loses connectivity, eSIM remains installed)
+    1. **Download**: Install eSIM profile to device. Optionally enable immediately.
+    2. **Enable**: Enable downloaded eSIM for connectivity (only one active per device)
+    3. **Disable**: Disable eSIM (device loses connectivity, eSIM remains installed)
     4. **Delete**: Permanently remove eSIM from device (irreversible)
     5. **Set-Fallback**: Configure backup eSIM for automatic failover
 
@@ -81,7 +81,7 @@ paths:
         - eSIM Operations
       summary: Download eSIM to device
       description: |
-        Downloads and installs an eSIM profile to a device. By default, the eSIM will be in disabled state after successful download and ready for activation. Optionally, the eSIM can be automatically activated after download.
+        Downloads and installs an eSIM profile to a device. By default, the eSIM will be in disabled state after successful download and ready for enabling. Optionally, the eSIM can be automatically enabled after download.
 
         **eSIM Identification**: Requires both EID and ICCID plus activationCode.
 
@@ -112,7 +112,7 @@ paths:
                   activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
                   sink: "https://webhook.example.com/esim-notifications"
               download_and_activate:
-                summary: Download and automatically activate
+                summary: Download and automatically enable
                 value:
                   esim:
                     eid: "89049032000000000000000000000001"
@@ -175,7 +175,7 @@ paths:
         - eSIM Operations
       summary: Enable eSIM
       description: |
-        Activates an eSIM for cellular connectivity provided valid connectivity services are configured in the eSIM and the network. Only one eSIM can be enabled per eUICC on the device - enabling automatically disables the currently active eSIM.
+        Enables an eSIM for cellular connectivity provided valid connectivity services are configured in the eSIM and the network. Only one eSIM can be enabled per eUICC on the device - enabling automatically disables the currently active eSIM.
 
         **eSIM Identification**: Uses ICCID to identify the profile.
 
@@ -255,7 +255,7 @@ paths:
         - eSIM Operations
       summary: Disable eSIM
       description: |
-        Deactivates the currently enabled eSIM. Device will lose cellular connectivity until another eSIM is enabled. The eSIM remains installed and can be re-enabled.
+        Disables the currently enabled eSIM. Device will lose cellular connectivity until another eSIM is enabled. The eSIM remains installed and can be re-enabled.
 
         **State Transition**: Enabled → Disabled
         **Required**: ICCID (identifies eSIM and device)
@@ -411,7 +411,7 @@ paths:
         - eSIM Operations
       summary: Set fallback eSIM
       description: |
-        Configures an eSIM as fallback (backup) profile for automatic activation if primary profiles fail. The eSIM must be in disabled state.
+        Configures an eSIM as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM must be in disabled state.
 
         **State Transition**: No state change (sets attribute only)
         **Required**: ICCID (identifies eSIM to designate as fallback)
@@ -678,7 +678,7 @@ components:
           type: boolean
           default: false
           description: |
-            Automatically activate the eSIM after successful download.
+            Automatically enable the eSIM after successful download.
             - false (default): eSIM remains in disabled state after download
             - true: eSIM is automatically enabled after download (only one eSIM can be active per device)
         sink:

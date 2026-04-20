@@ -23,9 +23,9 @@ The API operations are summarized in the table below:
 
 | **Operation** | **Purpose of the Operation** | **Key Abstractions and concepts** |
 | ---- | ------- | ----|
-| Download eSIM | Download and install new eSIM to device | An eSIM represents a downloadable connectivity configuration that can be installed on eSIM hardware (eUICC). The download operation combines SGP.32 Profile Download and Installation into a single operation resulting in a "Disabled" eSIM ready for activation. Optional `activateOnDownload` parameter enables immediate activation after successful download. |
-| Enable eSIM | Activate an eSIM which is already downloaded on the device | eSIM Activation makes an installed eSIM active for cellular connectivity (assuming valid connectivity services are configured in the eSIM). Only one eSIM can be enabled per device - enabling an eSIM automatically disables any currently active eSIM. |
-| Disable eSIM | Deactivate active eSIM | eSIM Deactivation makes an active eSIM inactive, removing cellular connectivity until another eSIM is enabled. The eSIM remains installed and can be re-enabled. |
+| Download eSIM | Download and install new eSIM to device | An eSIM represents a downloadable connectivity configuration that can be installed on eSIM hardware (eUICC). The download operation combines SGP.32 Profile Download and Installation into a single operation resulting in a "Disabled" eSIM ready for enabling. Optional `activateOnDownload` parameter enables immediate enabling after successful download. |
+| Enable eSIM | Enable an eSIM which is already downloaded on the device | eSIM Enabling makes an installed eSIM active for cellular connectivity (assuming valid connectivity services are configured in the eSIM). Only one eSIM can be enabled per device - enabling an eSIM automatically disables any currently active eSIM. |
+| Disable eSIM | Disable active eSIM | eSIM Disabling makes an active eSIM inactive, removing cellular connectivity until another eSIM is enabled. The eSIM remains installed and can be re-enabled. |
 | Delete eSIM | Permanently remove eSIM from device | eSIM Deletion permanently removes an eSIM from the device. This operation is irreversible and the eSIM cannot be recovered. The eSIM must be in disabled state before deletion. |
 | Set Fallback eSIM | Configure backup eSIM | Fallback Configuration designates a backup eSIM that can be automatically activated if the primary eSIM fails or becomes unavailable, ensuring service continuity. |
 | Retrieve Status | Query current status of eSIMs on device | eSIM Status provides current state information for all eSIMs on a device, including active, disabled, and fallback eSIM identification. |
@@ -79,7 +79,7 @@ sequenceDiagram
         API<<->>RSP: eSIM provisioning operations (e.g., SGP.32 Download Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Management APIs
         RSP<<->>Device: OTA Profile Download and Installation
         alt activateOnDownload: true
-            RSP<<->>Device: OTA Profile Activation
+            RSP<<->>Device: OTA Profile Enabling
         end
         alt Callback enabled
             API-->>App: CloudEvent: esim-downloaded (operationId, status=completed)
@@ -90,11 +90,11 @@ sequenceDiagram
     end
 
     rect rgba(240, 240, 240, 0.3)
-        note right of App: 2: Enable eSIM (if not activated on download)
+        note right of App: 2: Enable eSIM (if not enabled on download)
         App->>API: POST /esim/enable (iccid, sink, ...)
         API->>App: 202 Accepted (operationId)
-        API<<->>RSP: eSIM activation operations (e.g., SGP.32 Enable Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Management APIs
-        RSP<<->>Device: OTA Profile Activation
+        API<<->>RSP: eSIM enabling operations (e.g., SGP.32 Enable Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Management APIs
+        RSP<<->>Device: OTA Profile Enabling
         alt Callback enabled
             API-->>App: CloudEvent: esim-enabled (operationId, status=completed)
         else Polling
