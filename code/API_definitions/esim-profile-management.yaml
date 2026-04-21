@@ -75,7 +75,7 @@ tags:
     description: Lifecycle management operations for eSIM profiles
 
 paths:
-  /esim-profile-management/download:
+  /download:
     post:
       tags:
         - eSIM Profile Operations
@@ -132,7 +132,7 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim-profile-management/enable:
+  /enable:
     post:
       tags:
         - eSIM Profile Operations
@@ -187,7 +187,7 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim-profile-management/disable:
+  /disable:
     post:
       tags:
         - eSIM Profile Operations
@@ -240,7 +240,7 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim-profile-management/delete:
+  /delete:
     post:
       tags:
         - eSIM Profile Operations
@@ -293,7 +293,7 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim-profile-management/set-fallback:
+  /set-fallback:
     post:
       tags:
         - eSIM Profile Operations
@@ -346,7 +346,7 @@ paths:
         '422':
           $ref: '#/components/responses/Generic422'
 
-  /esim-profile-management/retrieve-status:
+  /retrieve-status:
     post:
       tags:
         - eSIM Profile Operations
@@ -404,7 +404,7 @@ paths:
         '404':
           $ref: '#/components/responses/Generic404'
 
-  /esim-profile-management/operations/{operationId}:
+  /operations/{operationId}:
     get:
       tags:
         - eSIM Profile Operations
