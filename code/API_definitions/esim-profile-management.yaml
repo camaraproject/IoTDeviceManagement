@@ -122,7 +122,6 @@ paths:
                     status: "accepted"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789012"
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
