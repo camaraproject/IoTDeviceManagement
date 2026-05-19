@@ -1,0 +1,796 @@
+openapi: 3.0.3
+info:
+  title: eSIM Profile Management API
+  description: |
+    CAMARA eSIM Profile Management API v0.1 - Developer-friendly eSIM Profile APIs
+
+    # Introduction
+
+    eSIM (embedded SIM) technology allows remote provisioning and management of cellular connectivity without physical SIM card replacement. The CAMARA eSIM Profile Management API provides a unified interface for eSIM Profile lifecycle operations including download, enable, disable, delete, and fallback configuration.
+
+    The target of the eSIM Profile operations is typically the eUICC on the device (as opposed to the cellular network).
+
+    **Terminology Note**: In this API, "eSIM Profile" refers to downloadable connectivity configurations installed on eSIM hardware (eUICC). "eSIM" refers to the hardware itself.
+
+    **Key roles**
+
+    | **Role Name** | **Description** |
+    | ---- | ------- |
+    | API Consumer | The entity that consumes the eSIM Profile Management APIs |
+    | API Provider | The entity that provides the eSIM Profile Management APIs |
+    | Network Provider | The entity that provides the physical network resources and eSIM Profile platform |
+    | Device Owner | The entity that owns or manages the devices containing eSIM hardware |
+
+    ## Operation-Specific Identification
+
+    - **Download**: Requires EID (target device) and activationCode. ICCID is assigned during download and returned in response.
+    - **Enable/Disable/Delete**: Requires only ICCID
+    - **Set-Fallback**: Requires only ICCID
+    - **Status**: Accepts either EID (all profiles on device) or ICCID (specific profile)
+
+    # Operation Lifecycle
+
+    1. **Download**: Install eSIM Profile to device in disabled state.
+    2. **Enable**: Enable downloaded eSIM Profile for connectivity (only one active per device)
+    3. **Disable**: Disable eSIM Profile (device loses connectivity, eSIM Profile remains installed)
+    4. **Delete**: Permanently remove eSIM Profile from device (irreversible)
+    5. **Set-Fallback**: Configure backup eSIM Profile for automatic failover
+
+    # States of eSIMs
+
+    eSIMs have two states: DISABLED and ENABLED.
+
+    - DISABLED: eSIM installed but not active
+    - ENABLED: eSIM active and providing connectivity
+    - Only one eSIM can be enabled per device (per eUICC on the device)
+    - Deletion permanently removes the eSIM
+
+    # Pre-requisites
+
+    Before using the eSIM Management API, agreements must be in place between the API Consumer and API Provider covering:
+
+    - Service plans and connectivity options
+    - Geographic coverage areas
+    - Device compatibility requirements
+    - Terms and conditions including pricing
+
+    This preparation phase is **outside the scope** of the eSIM Management API.
+
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: wip
+  x-camara-commonalities: 0.6
+
+servers:
+  - url: "{apiRoot}/esim-profile-management/vwip"
+    variables:
+      apiRoot:
+        default: http://localhost:9091
+        description: API root, defined by the service provider
+
+tags:
+  - name: eSIM Profile Operations
+    description: Lifecycle management operations for eSIM profiles
+
+paths:
+  /download:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Download eSIM Profile to device
+      description: |
+        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in disabled state after successful download and ready for enabling.
+
+        **eSIM Profile Identification**: Requires EID (target device) and activationCode. The ICCID will be assigned during the download process and returned in the response.
+
+        **State Transition**: None → Disabled
+
+        **Required**: EID + activationCode
+      operationId: downloadEsimProfile
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:download
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadEsimProfileRequest'
+            examples:
+              download_example:
+                summary: Download eSIM Profile to device
+                value:
+                  esimProfile:
+                    eid: "89049032000000000000000000000001"
+                  activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
+      responses:
+        '202':
+          description: Download request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                download_accepted:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440000"
+                    operation: "download"
+                    status: "accepted"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '422':
+          $ref: '#/components/responses/Generic422'
+
+  /enable:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Enable eSIM Profile
+      description: |
+        Enables an eSIM Profile for cellular connectivity provided valid connectivity services are configured in the eSIM Profile and the network. Only one eSIM Profile can be enabled per eUICC on the device - enabling automatically disables the currently active eSIM Profile.
+
+        **eSIM Profile Identification**: Uses ICCID to identify the profile.
+
+        **State Transition**: Disabled → Enabled
+        **Required**: ICCID
+      operationId: enableEsimProfile
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:enable
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnableEsimProfileRequest'
+            examples:
+              enable_profile:
+                summary: Enable eSIM Profile
+                value:
+                  esimProfile:
+                    iccid: "8901260123456789012"
+      responses:
+        '202':
+          description: Enable request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                enable_accepted:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440001"
+                    operation: "enable"
+                    status: "accepted"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+                      iccid: "8901260123456789012"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '422':
+          $ref: '#/components/responses/Generic422'
+
+  /disable:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Disable eSIM Profile
+      description: |
+        Disables the currently enabled eSIM Profile. Device will lose cellular connectivity until another eSIM Profile is enabled. The eSIM Profile remains installed and can be re-enabled.
+
+        **State Transition**: Enabled → Disabled
+        **Required**: ICCID (identifies eSIM Profile and device)
+      operationId: disableEsimProfile
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:disable
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisableEsimProfileRequest'
+            examples:
+              disable_profile:
+                summary: Disable eSIM Profile
+                value:
+                  esimProfile:
+                    iccid: "8901260123456789012"
+      responses:
+        '202':
+          description: Disable request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                disable_accepted:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440002"
+                    operation: "disable"
+                    status: "accepted"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+                      iccid: "8901260123456789012"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '422':
+          $ref: '#/components/responses/Generic422'
+
+  /delete:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Delete eSIM Profile
+      description: |
+        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in disabled state before deletion.
+
+        **State Transition**: Disabled → Deleted (removed)
+        **Required**: ICCID (identifies eSIM Profile and device)
+      operationId: deleteEsimProfile
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:delete
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteEsimProfileRequest'
+            examples:
+              delete_profile:
+                summary: Delete eSIM Profile
+                value:
+                  esimProfile:
+                    iccid: "8901260123456789012"
+      responses:
+        '202':
+          description: Delete request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                delete_accepted:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440003"
+                    operation: "delete"
+                    status: "accepted"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+                      iccid: "8901260123456789012"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '422':
+          $ref: '#/components/responses/Generic422'
+
+  /set-fallback:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Set fallback eSIM Profile
+      description: |
+        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in disabled state.
+
+        **State Transition**: No state change (sets attribute only)
+        **Required**: ICCID (identifies eSIM Profile to designate as fallback)
+      operationId: setFallbackEsimProfile
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:enable
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetFallbackEsimProfileRequest'
+            examples:
+              set_fallback:
+                summary: Set eSIM Profile as fallback
+                value:
+                  esimProfile:
+                    iccid: "8901260123456789013"
+      responses:
+        '202':
+          description: Set fallback request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                set_fallback_accepted:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440004"
+                    operation: "set-fallback"
+                    status: "accepted"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+                      iccid: "8901260123456789013"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '422':
+          $ref: '#/components/responses/Generic422'
+
+  /retrieve-status:
+    post:
+      tags:
+        - eSIM Profile Operations
+      summary: Retrieve eSIM Profile status
+      description: |
+        Retrieves current status and state information for eSIM Profiles.
+
+        **eSIM Profile Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
+      operationId: getEsimProfileStatus
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryEsimProfileStatusRequest'
+            examples:
+              query_by_eid:
+                summary: Query status by EID
+                value:
+                  esimProfile:
+                    eid: "89049032000000000000000000000001"
+              query_by_iccid:
+                summary: Query status by ICCID
+                value:
+                  esimProfile:
+                    iccid: "8901260123456789012"
+      responses:
+        '200':
+          description: eSIM Profile status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsimProfileStatusResponse'
+              examples:
+                device_status:
+                  value:
+                    esimProfiles:
+                      - eid: "89049032000000000000000000000001"
+                        iccid: "8901260123456789012"
+                        state: "enabled"
+                        isFallback: false
+                      - eid: "89049032000000000000000000000001"
+                        iccid: "8901260123456789013"
+                        state: "disabled"
+                        isFallback: true
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+
+  /operations/{operationId}:
+    get:
+      tags:
+        - eSIM Profile Operations
+      summary: Retrieve operation information
+      description: |
+        Retrieves detailed information about an eSIM Profile operation including status, results, and progress.
+
+        **Operation ID**: From any eSIM Profile operation response
+      operationId: retrieveOperation
+      security:
+        - openId:
+            - iot-device-management:esim-profiles:read
+      parameters:
+        - $ref: '#/components/parameters/x-correlator'
+        - name: operationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Operation identifier from original operation
+      responses:
+        '200':
+          description: Operation information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ESimProfileResponse'
+              examples:
+                operation_result:
+                  value:
+                    operationId: "550e8400-e29b-41d4-a716-446655440000"
+                    operation: "download"
+                    status: "completed"
+                    esimProfile:
+                      eid: "89049032000000000000000000000001"
+                      iccid: "8901260123456789012"
+                    result:
+                      completedAt: "2024-01-15T10:30:00Z"
+                      outcome: "success"
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+
+components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid_configuration
+      description: OpenID Connect authentication
+
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+
+  schemas:
+    XCorrelator:
+      type: string
+      pattern: ^[a-zA-Z0-9-_:;.\\/<>{}]{0,256}$
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+      description: Correlation identifier
+
+    # eSIM Profile Identifier Schemas
+    ESimProfileEid:
+      type: string
+      pattern: '^[0-9]{32}$'
+      description: eUICC Identifier (EID) - 32 decimal digits per SGP.22 v3.1 specification
+      example: "89049032000000000000000000000001"
+
+    ESimProfileIccid:
+      type: string
+      pattern: '^[0-9]{19,20}$'
+      description: Integrated Circuit Card Identifier (ICCID) - eSIM Profile identifier per ITU-T E.118
+      example: "8901260123456789012"
+
+    # eSIM Profile Schema - Flexible identification
+    ESimProfile:
+      type: object
+      description: |
+        eSIM Profile container with flexible identification.
+        - EID: eUICC hardware identifier (device)
+        - ICCID: eSIM Profile identifier (network subscription)
+        Operation-specific requirements are enforced by derived schemas.
+      properties:
+        eid:
+          $ref: '#/components/schemas/ESimProfileEid'
+        iccid:
+          $ref: '#/components/schemas/ESimProfileIccid'
+
+    ESimProfileForDownload:
+      allOf:
+        - $ref: '#/components/schemas/ESimProfile'
+        - required: [eid]
+      description: eSIM Profile identification for download operations (requires only EID, ICCID will be assigned during download)
+
+    ESimProfileForOperation:
+      allOf:
+        - $ref: '#/components/schemas/ESimProfile'
+        - required: [iccid]
+      description: eSIM Profile identification for enable/disable/delete/set-fallback operations (requires only ICCID)
+
+    ESimProfileForStatus:
+      allOf:
+        - $ref: '#/components/schemas/ESimProfile'
+        - anyOf:
+            - required: [eid]
+            - required: [iccid]
+      description: eSIM Profile identification for status operations (requires either EID or ICCID)
+    # Request schemas using new eSIM Profile identification
+    DownloadEsimProfileRequest:
+      type: object
+      description: Request to download eSIM Profile
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForDownload'
+        activationCode:
+          type: string
+          description: Profile activation code (LPA format)
+          example: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
+      required:
+        - esimProfile
+        - activationCode
+
+    EnableEsimProfileRequest:
+      type: object
+      description: Request to enable eSIM Profile
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
+      required:
+        - esimProfile
+
+    DisableEsimProfileRequest:
+      type: object
+      description: Request to disable eSIM Profile
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
+      required:
+        - esimProfile
+
+    DeleteEsimProfileRequest:
+      type: object
+      description: Request to delete eSIM Profile
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
+      required:
+        - esimProfile
+
+    SetFallbackEsimProfileRequest:
+      type: object
+      description: Request to set eSIM Profile as fallback
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForOperation'
+      required:
+        - esimProfile
+
+    QueryEsimProfileStatusRequest:
+      type: object
+      description: Request to query eSIM Profile status
+      properties:
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfileForStatus'
+      required:
+        - esimProfile
+
+    ESimProfileResponse:
+      type: object
+      description: Unified response for all eSIM Profile operations
+      properties:
+        operationId:
+          type: string
+          format: uuid
+          description: Unique identifier for tracking the operation
+        operation:
+          type: string
+          enum: [download, enable, disable, delete, set-fallback]
+          description: Type of operation performed
+        status:
+          type: string
+          enum: [accepted, completed, failed]
+          description: Current status of the operation
+        esimProfile:
+          $ref: '#/components/schemas/ESimProfile'
+        result:
+          type: object
+          description: Operation-specific result data (when completed)
+      required:
+        - operationId
+        - operation
+        - status
+        - esimProfile
+
+    EsimProfileStatusResponse:
+      type: object
+      description: Response containing eSIM Profile status information
+      properties:
+        esimProfiles:
+          type: array
+          items:
+            type: object
+            properties:
+              eid:
+                $ref: '#/components/schemas/ESimProfileEid'
+              iccid:
+                $ref: '#/components/schemas/ESimProfileIccid'
+              state:
+                type: string
+                enum: [enabled, disabled]
+                description: Current state of the eSIM Profile
+              isFallback:
+                type: boolean
+                description: Whether this eSIM Profile is designated as fallback
+            required:
+              - eid
+              - iccid
+              - state
+              - isFallback
+          description: All eSIM Profiles available on the device
+      required:
+        - esimProfiles
+
+    ErrorInfo:
+      type: object
+      description: Error information
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+      required:
+        - status
+        - code
+        - message
+
+  responses:
+    Generic400:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+
+    Generic401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated and a new authentication is required
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials.
+
+    Generic403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+
+    Generic404:
+      description: Not Found
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+                      - IDENTIFIER_NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+
+    Generic422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: '#/components/parameters/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - SERVICE_NOT_APPLICABLE
+                      - MISSING_IDENTIFIER
+                      - UNSUPPORTED_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
+          examples:
+            GENERIC_422_MISSING_IDENTIFIER:
+              description: An identifier is not included in the request and the device identification cannot be derived from the access token
+              value:
+                status: 422
+                code: MISSING_IDENTIFIER
+                message: The device cannot be identified.
