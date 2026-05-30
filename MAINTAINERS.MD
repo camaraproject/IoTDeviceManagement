@@ -5,3 +5,4 @@
 | China Telecom | Furong Chen | chenfr2-ChinaTelecom |
 | HUAWEI | Xunli Yang | XunliYang |
 | Ericsson | Rajat Kandoi | rkandoi |
+| Verizon | Dongxu Shan | dsrg1803 |
