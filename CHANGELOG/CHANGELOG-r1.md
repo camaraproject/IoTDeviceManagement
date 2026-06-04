@@ -84,7 +84,7 @@ The API definition(s) are based on
 
 ### Fixed
 
-* _To be filled during release review_
+* N/A
 
 ### Removed
 
