@@ -80,7 +80,7 @@ The API definition(s) are based on
 
 ### Changed
 
-* _To be filled during release review_
+* N/A
 
 ### Fixed
 
