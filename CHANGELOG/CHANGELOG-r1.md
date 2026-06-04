@@ -88,7 +88,7 @@ The API definition(s) are based on
 
 ### Removed
 
-* _To be filled during release review_
+* N/A
 
 **Full Changelog**: https://github.com/camaraproject/IoTDeviceManagement/commits/r1.1
 
