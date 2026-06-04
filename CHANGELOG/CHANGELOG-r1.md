@@ -67,7 +67,7 @@ The API definition(s) are based on
 
 ## esim-profile-management 0.1.0-alpha.1
 
-**esim-profile-management 0.1.0-alpha.1 is ...**
+**esim-profile-management 0.1.0-alpha.1 is the first alpha version of this API.**
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/IoTDeviceManagement/r1.1/code/API_definitions/esim-profile-management.yaml&nocors)
