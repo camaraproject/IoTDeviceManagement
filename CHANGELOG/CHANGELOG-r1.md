@@ -76,7 +76,7 @@ The API definition(s) are based on
 
 ### Added
 
-* _To be filled during release review_
+* Initial alpha release of the eSIM Profile Management API (`esim-profile-management 0.1.0-alpha.1`), providing eSIM Profile lifecycle management on the device eUICC — with download, enable, disable, delete, set-fallback, status retrieval, and operation-tracking endpoints.
 
 ### Changed
 
