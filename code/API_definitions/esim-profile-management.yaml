@@ -483,24 +483,14 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
-      openIdConnectUrl: https://example.com/.well-known/openid_configuration
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
       description: OpenID Connect authentication
 
   parameters:
     x-correlator:
-      name: x-correlator
-      in: header
-      description: Correlation id for the different services
-      schema:
-        $ref: '#/components/schemas/XCorrelator'
+      $ref: '../common/CAMARA_common.yaml#/components/parameters/x-correlator'
 
   schemas:
-    XCorrelator:
-      type: string
-      maxLength: 256
-      pattern: ^[a-zA-Z0-9-_:;.\\/<>{}]{0,256}$
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-      description: Correlation identifier
 
     # eSIM Profile Identifier Schemas
     ESimProfileEid:
@@ -670,166 +660,14 @@ components:
       required:
         - esimProfiles
 
-    ErrorInfo:
-      type: object
-      description: Error information
-      properties:
-        status:
-          type: integer
-          format: int32
-          minimum: -2147483648
-          maximum: 2147483647
-          description: HTTP status code
-        code:
-          type: string
-          maxLength: 64
-          description: Error code
-        message:
-          type: string
-          maxLength: 256
-          description: Error message
-        details:
-          type: string
-          maxLength: 512
-          description: Additional error details
-      required:
-        - status
-        - code
-        - message
-
   responses:
     Generic400:
-      description: Bad Request
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 400
-                  code:
-                    enum:
-                      - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
-          examples:
-            GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic400'
     Generic401:
-      description: Unauthorized
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 401
-                  code:
-                    enum:
-                      - UNAUTHENTICATED
-          examples:
-            GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new authentication is required
-              value:
-                status: 401
-                code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
     Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
     Generic404:
-      description: Not Found
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 404
-                  code:
-                    enum:
-                      - NOT_FOUND
-                      - IDENTIFIER_NOT_FOUND
-          examples:
-            GENERIC_404_NOT_FOUND:
-              description: Resource is not found
-              value:
-                status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic404'
     Generic422:
-      description: Unprocessable Content
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 422
-                  code:
-                    enum:
-                      - SERVICE_NOT_APPLICABLE
-                      - MISSING_IDENTIFIER
-                      - UNSUPPORTED_IDENTIFIER
-                      - UNNECESSARY_IDENTIFIER
-          examples:
-            GENERIC_422_MISSING_IDENTIFIER:
-              description: An identifier is not included in the request and the device identification cannot be derived from the access token
-              value:
-                status: 422
-                code: MISSING_IDENTIFIER
-                message: The device cannot be identified.
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic422'
