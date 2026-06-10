@@ -1,0 +1,601 @@
+openapi: 3.0.3
+info:
+  title: Device Communication Function
+  version: wip
+  description: |
+    # Introduction
+
+    This API allows enterprise customers to manage the communication function of IoT devices, including activation and deactivation of VOICE, SMS, and DATA services.
+
+    This API is part of the IoT Device Management API family which includes:
+    - Communication Function Management (this API)
+    - Device Subscription State Management
+    - Real-Time Monitoring
+
+    Operators can obtain the status by querying the information in the Connection Management Platform and UDM/HSS contracted network element devices of the mobile network.
+
+    The API is suitable for organizations that require traffic control, such as automotive companies.
+
+    # Relevant terms and definitions
+
+    **Device**: A device refers to any physical entity that can connect to a network and participate in network communication.
+      At least one identifier for the device (user equipment) out of four options: IPv4 address, IPv6 address, Phone number, or Network Access Identifier (not supported for this API version) assigned by the mobile network operator for the device.
+
+    **FunctionType**: The type of communication function contains only SMS, VOICE and DATA.
+
+    # API functionality
+
+    The API defines the following service endpoints:
+
+    - `POST /activate` - Activate the communication function of IoT devices, including VOICE, SMS, DATA services
+    - `POST /deactivate` - Deactivate the communication function of IoT devices, including VOICE, SMS, DATA services
+
+    To call these endpoints, the API consumer must first obtain a valid access token from the token endpoint, which is then passed as an Authorization header. When a 2-legged access token is used, the API consumer must also pass at least one of the available IoT subscription identifiers in the body of the request.
+    The type of communication function is also needed in the body of the request.
+
+    If the request is valid, the API response is a JSON object containing the type of communication function operated on and the status of that communication function after this operation.
+    - Responses will always contain `functionType`, which represents the type of communication function operated on by the API, and `functionStatus`, which indicates the status of that communication function following the operation.
+
+    An example of a JSON response object is as follows:
+    ```
+    {
+       "functionType": "SMS",
+       "functionStatus": "active"
+    }
+    ```
+
+    ## Error handling
+
+    Errors may be returned for the following reasons. Note that this list is not exhaustive.
+
+    `401 UNAUTHENTICATED` or `401 AUTHENTICATION_REQUIRED`:
+    - The access token is not a valid access token for the API provider
+    - The access token was valid but has now expired
+
+    `400 INVALID_ARGUMENT`:
+    - The API request is not compliant with this OAS definition
+
+    `400 OUT_OF_RANGE`:
+    - A parameter value in the API request is outwith the range documented in this OAS definition for that parameter
+
+    `404 IDENTIFIER_NOT_FOUND`:
+    - The device identified by the `device` object in the request is not managed by the API provider
+
+    `403 PERMISSION_DENIED`:
+    - The access token does not have the required scope for the endpoint being called
+    - The end user has not consented to the API consumer getting access to the device identifier information (2-legged access token only)
+
+    `422 IDENTIFIER_MISMATCH`:
+    - Multiple parameters have been provided in the `device` object, and these do not identify the same device
+
+    `422 UNSUPPORTED_IDENTIFIER`:
+    - A parameter provided in the `device` object is not supported by this implementation (e.g. `networkAccessIdentifier`)
+
+    `422 UNNECESSARY_ACTIVATION`:
+    `422 UNNECESSARY_DEACTIVATION`:
+    - The specified communication function of the `device` has already been activated or deactivated but the corresponding operation type parameter was still provided
+
+    `422 MISSING_IDENTIFIER`:
+    `422 UNNECESSARY_IDENTIFIER`:
+    - See the section "Identifying the device from the access token" below
+
+    `429 QUOTA_EXCEEDED`:
+    - The API consumer has used up the quota of API requests that they were allocated for this API
+
+    `429 TOO_MANY_REQUESTS`:
+    - The rate at which the API consumer is sending requests has exceeded that allowed by the API provider. Try again later.
+
+    Other errors may be returned by implementations. These will have their usual meaning for the associated HTTP status codes.
+
+    # Further info and support
+
+    ## Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the onboarding process, happening between the API consumer and the API provider, taking into account the declared purpose for accessing the API, whilst also being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
+
+    ## Identifying the device from the access token
+
+    This API requires the API consumer to identify a device as the subject of the API as follows:
+    - When the API is invoked using a two-legged access token, the subject will be identified from the optional `device` object, which therefore MUST be provided.
+
+    - When a three-legged access token is used however, this optional identifier MUST NOT be provided, as the subject will be uniquely identified from the access token.
+
+    This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
+
+    ### Error handling:
+    - If the subject cannot be identified from the access token and the optional `device` object is not included in the request, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+
+    - If the subject can be identified from the access token and the optional `device` object is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same device is identified by these two methods, as the server is unable to make this comparison.
+
+    (FAQs will be added in a later version of the documentation)
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  x-camara-commonalities: 0.5
+
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/IoTDeviceManagement
+
+servers:
+  - url: "{apiRoot}/device-communication-function/vwip"
+    variables:
+      apiRoot:
+        default: https://example.com:443
+        description: API root, to be defined by the service provider
+
+tags:
+  - name: Device Communication Function
+    description: APIs for managing IoT device communication functions (VOICE, SMS, DATA)
+
+paths:
+  "/activate":
+    post:
+      summary: Activate communication function for IoT devices
+      description: This API allows enterprise customers to activate the communication function of IoT devices, including VOICE, SMS, DATA services
+      operationId: activate-communication-function
+      tags:
+        - Device Communication Function
+      security:
+        - openId:
+            - device-communication-function:manage
+
+      parameters:
+        - in: header
+          name: x-correlator
+          description: Correlation id for the different services
+          required: false
+          schema:
+            type: string
+
+      requestBody:
+        description: Parameters to activate one communication function for a device
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationFunctionRequest"
+            examples:
+              ActivateSMSByPhoneNumber:
+                $ref: '#/components/examples/ActivateSMSByPhoneNumber'
+              ActivateDATAByIPAddress:
+                $ref: '#/components/examples/ActivateDATAByIPAddress'
+              ActivateVOICEByMultipleIdentifiers:
+                $ref: '#/components/examples/ActivateVOICEByMultipleIdentifiers'
+              ActivateSMSBy3LeggedToken:
+                $ref: '#/components/examples/ActivateSMSBy3LeggedToken'
+
+      responses:
+        "200":
+          $ref: '#/components/responses/CommunicationFunctionResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "422":
+          $ref: '#/components/responses/UnprocessableContent'
+        "429":
+          $ref: '#/components/responses/TooManyRequests'
+
+  "/deactivate":
+    post:
+      summary: Deactivate communication function for IoT devices
+      description: This API allows enterprise customers to deactivate the communication function of IoT devices, including VOICE, SMS, DATA services
+      operationId: deactivate-communication-function
+      tags:
+        - Device Communication Function
+      security:
+        - openId:
+            - device-communication-function:manage
+
+      parameters:
+        - in: header
+          name: x-correlator
+          description: Correlation id for the different services
+          required: false
+          schema:
+            type: string
+
+      requestBody:
+        description: Parameters to deactivate one communication function for a device
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommunicationFunctionRequest"
+            examples:
+              DeactivateSMSByPhoneNumber:
+                $ref: '#/components/examples/DeactivateSMSByPhoneNumber'
+              DeactivateDATAByIPAddress:
+                $ref: '#/components/examples/DeactivateDATAByIPAddress'
+              DeactivateVOICEByMultipleIdentifiers:
+                $ref: '#/components/examples/DeactivateVOICEByMultipleIdentifiers'
+              DeactivateSMSBy3LeggedToken:
+                $ref: '#/components/examples/DeactivateSMSBy3LeggedToken'
+
+      responses:
+        "200":
+          $ref: '#/components/responses/CommunicationFunctionResponse'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "422":
+          $ref: '#/components/responses/UnprocessableContent'
+        "429":
+          $ref: '#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    openId:
+      description: Common security scheme for all CAMARA APIs
+      type: openIdConnect
+      openIdConnectUrl: https://example.org/.well-known/openid-configuration
+
+  headers:
+    X-Correlator:
+      description: Correlation id for the different services
+      required: false
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9-]{0,55}$"
+        example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+
+  responses:
+    CommunicationFunctionResponse:
+      description: Communication function operation result
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - functionType
+              - functionStatus
+            properties:
+              functionType:
+                $ref: "#/components/schemas/FunctionType"
+              functionStatus:
+                $ref: "#/components/schemas/FunctionStatus"
+          examples:
+            ActivateSuccess:
+              summary: Successful activation
+              value:
+                functionType: "SMS"
+                functionStatus: "active"
+            DeactivateSuccess:
+              summary: Successful deactivation
+              value:
+                functionType: "DATA"
+                functionStatus: "inactive"
+
+    BadRequest:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
+          examples:
+            InsufficientDeviceParameters:
+              description: Sufficient parameters must be provided to allow the target UE to be identified
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: "At least one of phoneNumber, networkAccessIdentifier, ipv4Address and ipv6Address must be specified"
+            InsufficientFunctionTypeParameters:
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: "Function type must be specified"
+            InconsistentDeviceProperties:
+              description: Device parameters provided identify different devices
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: "Multiple inconsistent device parameters specified"
+
+    Unauthorized:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+                      - AUTHENTICATION_REQUIRED
+
+    Forbidden:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+
+    NotFound:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - IDENTIFIER_NOT_FOUND
+
+    UnprocessableContent:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - IDENTIFIER_MISMATCH
+                      - MISSING_IDENTIFIER
+                      - UNSUPPORTED_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
+                      - UNNECESSARY_ACTIVATION
+                      - UNNECESSARY_DEACTIVATION
+
+    TooManyRequests:
+      description: Too Many Requests
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/X-Correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 429
+                  code:
+                    enum:
+                      - QUOTA_EXCEEDED
+                      - TOO_MANY_REQUESTS
+
+  schemas:
+    CommunicationFunctionRequest:
+      description: Request to activate or deactivate a communication function for a device
+      type: object
+      properties:
+        device:
+          $ref: "#/components/schemas/Device"
+        functionType:
+          $ref: "#/components/schemas/FunctionType"
+      required:
+        - functionType
+
+    FunctionType:
+      description: The type of communication function
+      type: string
+      enum:
+        - SMS
+        - VOICE
+        - DATA
+      example: SMS
+
+    FunctionStatus:
+      description: The status of the communication function
+      type: string
+      enum:
+        - active
+        - inactive
+      example: active
+
+    Device:
+      description: |
+        End-user equipment able to connect to a mobile network. Examples of devices include smartphones or IoT sensors/actuators.
+        The developer can choose to provide the below specified device identifiers:
+        * `ipv4Address`
+        * `ipv6Address`
+        * `phoneNumber`
+        * `networkAccessIdentifier`
+        NOTE 1: The MNO might support only a subset of these options. The API invoker can provide multiple identifiers to be compatible across different MNOs. In this case the identifiers MUST belong to the same device.
+        NOTE 2: For the current Commonalities release, we are enforcing that the networkAccessIdentifier is only part of the schema for future-proofing, and CAMARA does not currently allow its use. After the CAMARA meta-release work is concluded and the relevant issues are resolved, its use will need to be explicitly documented in the guidelines.
+      type: object
+      properties:
+        phoneNumber:
+          $ref: "#/components/schemas/PhoneNumber"
+        networkAccessIdentifier:
+          $ref: "#/components/schemas/NetworkAccessIdentifier"
+        ipv4Address:
+          $ref: "#/components/schemas/DeviceIpv4Addr"
+        ipv6Address:
+          $ref: "#/components/schemas/DeviceIpv6Address"
+      minProperties: 1
+
+    DeviceIpv4Addr:
+      type: object
+      description: |
+        The device should be identified by either the public (observed) IP address and port as seen by the application server, or the private (local) and any public (observed) IP addresses in use by the device.
+      properties:
+        publicAddress:
+          $ref: "#/components/schemas/SingleIpv4Addr"
+        privateAddress:
+          $ref: "#/components/schemas/SingleIpv4Addr"
+        publicPort:
+          $ref: "#/components/schemas/Port"
+      anyOf:
+        - required: [publicAddress, privateAddress]
+        - required: [publicAddress, publicPort]
+
+    ErrorInfo:
+      description: Common CAMARA error response object
+      type: object
+      properties:
+        code:
+          type: string
+          description: A short, human-readable summary of the problem type
+        status:
+          type: integer
+          description: The HTTP status code
+        message:
+          type: string
+          description: Human readable explanation specific to this occurrence of the problem
+      required:
+        - code
+        - status
+        - message
+
+    NetworkAccessIdentifier:
+      description: A public identifier addressing a subscription in a mobile network.
+      type: string
+      example: "123456789@domain.com"
+
+    PhoneNumber:
+      description: A public identifier addressing a telephone subscription in E.164 format.
+      type: string
+      pattern: '^\+[1-9][0-9]{4,14}$'
+      example: "+123456789"
+
+    Port:
+      description: TCP or UDP port number
+      type: integer
+      minimum: 1024
+      maximum: 65535
+
+    SingleIpv4Addr:
+      description: A single IPv4 address with no subnet mask
+      type: string
+      format: ipv4
+      example: "84.125.93.10"
+
+    DeviceIpv6Address:
+      description: IPv6 address for device identification
+      type: string
+      format: ipv6
+      example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
+
+  examples:
+    ActivateSMSByPhoneNumber:
+      description: Activate SMS service for one device by phone number
+      value:
+        device:
+          phoneNumber: "+123456789"
+        functionType: "SMS"
+
+    ActivateDATAByIPAddress:
+      description: Activate DATA service for one device by IP address
+      value:
+        device:
+          ipv4Address:
+            publicAddress: "84.125.93.10"
+            publicPort: 59765
+        functionType: "DATA"
+
+    ActivateVOICEByMultipleIdentifiers:
+      description: Activate VOICE service for one device by multiple device identifiers
+      value:
+        device:
+          phoneNumber: "+123456789"
+          ipv4Address:
+            publicAddress: "84.125.93.10"
+            publicPort: 59765
+        functionType: "VOICE"
+
+    ActivateSMSBy3LeggedToken:
+      description: Only the functionType parameters need to be passed when device is identified by access token
+      value:
+        functionType: "SMS"
+
+    DeactivateSMSByPhoneNumber:
+      description: Deactivate SMS service for one device by phone number
+      value:
+        device:
+          phoneNumber: "+123456789"
+        functionType: "SMS"
+
+    DeactivateDATAByIPAddress:
+      description: Deactivate DATA service for one device by IP address
+      value:
+        device:
+          ipv4Address:
+            publicAddress: "84.125.93.10"
+            publicPort: 59765
+        functionType: "DATA"
+
+    DeactivateVOICEByMultipleIdentifiers:
+      description: Deactivate VOICE service for one device by multiple device identifiers
+      value:
+        device:
+          phoneNumber: "+123456789"
+          ipv4Address:
+            publicAddress: "84.125.93.10"
+            publicPort: 59765
+        functionType: "VOICE"
+
+    DeactivateSMSBy3LeggedToken:
+      description: Only the functionType parameters need to be passed when device is identified by access token
+      value:
+        functionType: "SMS"
