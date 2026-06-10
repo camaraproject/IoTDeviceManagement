@@ -56,19 +56,44 @@ info:
 
     This preparation phase is **outside the scope** of the eSIM Management API.
 
+    <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
+    # Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the onboarding process, happening between the API consumer and the API provider, taking into account the declared purpose for accessing the API, whilst also being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
+    <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
+
+    <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
+    # Additional CAMARA error responses
+
+    The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
+
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+
+    As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
+    <!-- CAMARA:MANDATORY:additional-error-responses:END -->
+
+    <!-- CAMARA:MANDATORY:request-body-strictness:BEGIN -->
+    # Request body strictness
+
+    This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
+    <!-- CAMARA:MANDATORY:request-body-strictness:END -->
 
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: 0.8.0
 
 servers:
   - url: "{apiRoot}/esim-profile-management/vwip"
     variables:
       apiRoot:
         default: http://localhost:9091
-        description: API root, defined by the service provider
+        description: "API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`"
 
 tags:
   - name: eSIM Profile Operations
@@ -423,7 +448,8 @@ paths:
           required: true
           schema:
             type: string
-            format: uuid
+            maxLength: 64
+            pattern: '^[a-zA-Z0-9-_:.]+$'
           description: Operation identifier from original operation
       responses:
         '200':
@@ -471,6 +497,7 @@ components:
   schemas:
     XCorrelator:
       type: string
+      maxLength: 256
       pattern: ^[a-zA-Z0-9-_:;.\\/<>{}]{0,256}$
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
       description: Correlation identifier
@@ -478,12 +505,14 @@ components:
     # eSIM Profile Identifier Schemas
     ESimProfileEid:
       type: string
+      maxLength: 32
       pattern: '^[0-9]{32}$'
       description: eUICC Identifier (EID) - 32 decimal digits per SGP.22 v3.1 specification
       example: "89049032000000000000000000000001"
 
     ESimProfileIccid:
       type: string
+      maxLength: 20
       pattern: '^[0-9]{19,20}$'
       description: Integrated Circuit Card Identifier (ICCID) - eSIM Profile identifier per ITU-T E.118
       example: "8901260123456789012"
@@ -530,6 +559,7 @@ components:
           $ref: '#/components/schemas/ESimProfileForDownload'
         activationCode:
           type: string
+          maxLength: 256
           description: Profile activation code (LPA format)
           example: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
       required:
@@ -587,7 +617,8 @@ components:
       properties:
         operationId:
           type: string
-          format: uuid
+          maxLength: 64
+          pattern: '^[a-zA-Z0-9-_:.]+$'
           description: Unique identifier for tracking the operation
         operation:
           type: string
@@ -614,8 +645,10 @@ components:
       properties:
         esimProfiles:
           type: array
+          maxItems: 256
           items:
             type: object
+            description: Individual eSIM Profile status entry
             properties:
               eid:
                 $ref: '#/components/schemas/ESimProfileEid'
@@ -643,15 +676,21 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: -2147483648
+          maximum: 2147483647
           description: HTTP status code
         code:
           type: string
+          maxLength: 64
           description: Error code
         message:
           type: string
+          maxLength: 256
           description: Error message
         details:
           type: string
+          maxLength: 512
           description: Additional error details
       required:
         - status
