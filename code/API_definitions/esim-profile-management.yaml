@@ -637,7 +637,8 @@ components:
         completedAt:
           type: string
           format: date-time
-          description: Timestamp when the operation completed
+          maxLength: 64
+          description: Timestamp when the operation completed. Must follow RFC 3339.
         outcome:
           type: string
           enum: [success, failed]
@@ -647,7 +648,8 @@ components:
           maxLength: 256
           description: Human-readable failure reason (present when outcome is failed)
         assignedIccid:
-          $ref: '#/components/schemas/ESimProfileIccid'
+          allOf:
+            - $ref: '#/components/schemas/ESimProfileIccid'
           description: ICCID assigned during download (present for successful download operations)
       required:
         - completedAt
