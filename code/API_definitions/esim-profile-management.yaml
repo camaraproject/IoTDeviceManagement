@@ -488,6 +488,7 @@ paths:
                     result:
                       completedAt: "2024-01-15T10:30:00Z"
                       outcome: "success"
+                      assignedIccid: "8901260123456789012"
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -619,6 +620,29 @@ components:
       required:
         - esimProfile
 
+    ESimProfileOperationResult:
+      type: object
+      description: Result details for a completed or failed operation
+      properties:
+        completedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the operation completed
+        outcome:
+          type: string
+          enum: [success, failed]
+          description: Final outcome of the operation
+        failureReason:
+          type: string
+          maxLength: 256
+          description: Human-readable failure reason (present when outcome is failed)
+        assignedIccid:
+          $ref: '#/components/schemas/ESimProfileIccid'
+          description: ICCID assigned during download (present for successful download operations)
+      required:
+        - completedAt
+        - outcome
+
     ESimProfileResponse:
       type: object
       description: Unified response for all eSIM Profile operations
@@ -639,8 +663,7 @@ components:
         esimProfile:
           $ref: '#/components/schemas/ESimProfile'
         result:
-          type: object
-          description: Operation-specific result data (when completed)
+          $ref: '#/components/schemas/ESimProfileOperationResult'
       required:
         - operationId
         - operation
