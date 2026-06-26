@@ -378,6 +378,8 @@ paths:
       description: |
         Retrieves current status and state information for eSIM Profiles.
 
+        This operation uses POST despite being a read operation. Device identifiers (EID/ICCID) are passed in the request body rather than as URL parameters to prevent their exposure in server logs, proxy caches, and browser history.
+
         **eSIM Profile Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
       operationId: getEsimProfileStatus
       security:
