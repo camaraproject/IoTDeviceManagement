@@ -56,6 +56,16 @@ info:
 
     This preparation phase is **outside the scope** of the eSIM Management API.
 
+    # Error Handling
+
+    All operations that require device interaction (download, enable, disable, delete, set-fallback) are asynchronous and return 202 with an operationId on acceptance. Errors are reported as follows:
+
+    - **Synchronous errors (immediate 4xx)**: Failures detectable without device interaction are returned immediately. This includes authentication failures (401), authorization failures (403), unknown identifiers (404), state-precondition violations (409), malformed requests (400), and inapplicable service (422).
+
+    - **Asynchronous failures (202 → status: failed)**: Failures that occur during device-side execution (e.g. device unreachable, OTA timeout, SM-DP+ error) are reported via the operation resource. Poll GET /operations/{operationId} to retrieve the outcome.
+
+    Operation status is retrieved by polling GET /operations/{operationId}. Event-based notifications are not supported in this version.
+
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
     # Authorization and authentication
 
