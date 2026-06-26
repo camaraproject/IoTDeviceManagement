@@ -330,7 +330,7 @@ paths:
       operationId: setFallbackEsimProfile
       security:
         - openId:
-            - iot-device-management:esim-profiles:enable
+            - iot-device-management:esim-profiles:set-fallback
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -382,7 +382,7 @@ paths:
       operationId: getEsimProfileStatus
       security:
         - openId:
-            - iot-device-management:esim-profiles:read
+            - iot-device-management:esim-profiles:retrieve-status
       requestBody:
         required: true
         content:
@@ -440,7 +440,7 @@ paths:
       operationId: retrieveOperation
       security:
         - openId:
-            - iot-device-management:esim-profiles:read
+            - iot-device-management:esim-profiles:retrieve-operation
       parameters:
         - $ref: '#/components/parameters/x-correlator'
         - name: operationId
