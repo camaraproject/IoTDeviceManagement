@@ -30,7 +30,7 @@ info:
 
     # Operation Lifecycle
 
-    1. **Download**: Install eSIM Profile to device in disabled state.
+    1. **Download**: Install eSIM Profile to device in DISABLED state.
     2. **Enable**: Enable downloaded eSIM Profile for connectivity (only one active per device)
     3. **Disable**: Disable eSIM Profile (device loses connectivity, eSIM Profile remains installed)
     4. **Delete**: Permanently remove eSIM Profile from device (irreversible)
@@ -106,11 +106,11 @@ paths:
         - eSIM Profile Operations
       summary: Download eSIM Profile to device
       description: |
-        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in disabled state after successful download and ready for enabling.
+        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in DISABLED state after successful download and ready for enabling.
 
         **eSIM Profile Identification**: Requires EID (target device) and activationCode. The ICCID will be assigned during the download process and returned in the response.
 
-        **State Transition**: None → Disabled
+        **State Transition**: None → DISABLED
 
         **Required**: EID + activationCode
       operationId: downloadEsimProfile
@@ -166,7 +166,7 @@ paths:
 
         **eSIM Profile Identification**: Uses ICCID to identify the profile.
 
-        **State Transition**: Disabled → Enabled
+        **State Transition**: DISABLED → ENABLED
         **Required**: ICCID
       operationId: enableEsimProfile
       security:
@@ -219,7 +219,7 @@ paths:
       description: |
         Disables the currently enabled eSIM Profile. Device will lose cellular connectivity until another eSIM Profile is enabled. The eSIM Profile remains installed and can be re-enabled.
 
-        **State Transition**: Enabled → Disabled
+        **State Transition**: ENABLED → DISABLED
         **Required**: ICCID (identifies eSIM Profile and device)
       operationId: disableEsimProfile
       security:
@@ -270,9 +270,9 @@ paths:
         - eSIM Profile Operations
       summary: Delete eSIM Profile
       description: |
-        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in disabled state before deletion.
+        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in DISABLED state before deletion.
 
-        **State Transition**: Disabled → Deleted (removed)
+        **State Transition**: DISABLED → Deleted (removed)
         **Required**: ICCID (identifies eSIM Profile and device)
       operationId: deleteEsimProfile
       security:
@@ -323,7 +323,7 @@ paths:
         - eSIM Profile Operations
       summary: Set fallback eSIM Profile
       description: |
-        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in disabled state.
+        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in DISABLED state.
 
         **State Transition**: No state change (sets attribute only)
         **Required**: ICCID (identifies eSIM Profile to designate as fallback)
@@ -413,11 +413,11 @@ paths:
                     esimProfiles:
                       - eid: "89049032000000000000000000000001"
                         iccid: "8901260123456789012"
-                        state: "enabled"
+                        state: "ENABLED"
                         isFallback: false
                       - eid: "89049032000000000000000000000001"
                         iccid: "8901260123456789013"
-                        state: "disabled"
+                        state: "DISABLED"
                         isFallback: true
         '400':
           $ref: '#/components/responses/Generic400'
@@ -646,7 +646,7 @@ components:
                 $ref: '#/components/schemas/ESimProfileIccid'
               state:
                 type: string
-                enum: [enabled, disabled]
+                enum: [ENABLED, DISABLED]
                 description: Current state of the eSIM Profile
               isFallback:
                 type: boolean
