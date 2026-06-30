@@ -62,7 +62,7 @@ info:
 
     - **Synchronous errors (immediate 4xx)**: Failures detectable without device interaction are returned immediately. This includes authentication failures (401), authorization failures (403), unknown identifiers (404), state-precondition violations (409), malformed requests (400), and inapplicable service (422).
 
-    - **Asynchronous failures (202 → status: failed)**: Failures that occur during device-side execution (e.g. device unreachable, OTA timeout, SM-DP+ error) are reported via the operation resource. Poll GET /operations/{operationId} to retrieve the outcome.
+    - **Asynchronous failures (202 → status: COMPLETED, result.outcome: FAILED)**: Failures that occur during device-side execution (e.g. device unreachable, OTA timeout, SM-DP+ error) are reported via the operation resource. Poll GET /operations/{operationId} to retrieve the outcome.
 
     Operation status is retrieved by polling GET /operations/{operationId}. Event-based notifications are not supported in this version.
 
@@ -159,7 +159,7 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440000"
                     operation: "download"
-                    status: "accepted"
+                    status: "ACCEPTED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
         '400':
@@ -220,7 +220,7 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440001"
                     operation: "enable"
-                    status: "accepted"
+                    status: "ACCEPTED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
@@ -282,7 +282,7 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440002"
                     operation: "disable"
-                    status: "accepted"
+                    status: "ACCEPTED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
@@ -344,7 +344,7 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440003"
                     operation: "delete"
-                    status: "accepted"
+                    status: "ACCEPTED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
@@ -414,7 +414,7 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440004"
                     operation: "set-fallback"
-                    status: "accepted"
+                    status: "ACCEPTED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789013"
@@ -536,13 +536,13 @@ paths:
                   value:
                     operationId: "550e8400-e29b-41d4-a716-446655440000"
                     operation: "download"
-                    status: "completed"
+                    status: "COMPLETED"
                     esimProfile:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
                     result:
                       completedAt: "2024-01-15T10:30:00Z"
-                      outcome: "success"
+                      outcome: "SUCCESS"
                       assignedIccid: "8901260123456789012"
         '400':
           $ref: '#/components/responses/Generic400'
@@ -696,12 +696,12 @@ components:
           description: Timestamp when the operation completed. Must follow RFC 3339.
         outcome:
           type: string
-          enum: [success, failed]
+          enum: [SUCCESS, FAILED]
           description: Final outcome of the operation
         failureReason:
           type: string
           maxLength: 256
-          description: Human-readable failure reason (present when outcome is failed)
+          description: Human-readable failure reason (present when outcome is FAILED)
         assignedIccid:
           allOf:
             - $ref: '#/components/schemas/ESimProfileIccid'
@@ -725,12 +725,15 @@ components:
           description: Type of operation performed
         status:
           type: string
-          enum: [accepted, completed, failed]
-          description: Current status of the operation
+          enum: [ACCEPTED, COMPLETED]
+          description: |
+            Lifecycle status of the operation: `ACCEPTED` while in progress, `COMPLETED` once processing has finished. The outcome of a completed operation (success or failure) is carried in `result.outcome`.
         esimProfile:
           $ref: '#/components/schemas/ESimProfile'
         result:
-          $ref: '#/components/schemas/ESimProfileOperationResult'
+          allOf:
+            - $ref: '#/components/schemas/ESimProfileOperationResult'
+          description: Outcome details of the operation. Absent while `status` is `ACCEPTED`; present and required once `status` is `COMPLETED`.
       required:
         - operationId
         - operation

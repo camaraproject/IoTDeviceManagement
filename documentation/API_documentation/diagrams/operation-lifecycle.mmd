@@ -1,5 +1,4 @@
 stateDiagram-v2
-    [*] --> accepted: POST operation
-    accepted --> completed: Processing finished
-    accepted --> failed: Device-side execution failed
-    note right of completed: result.outcome = success | failed
+    [*] --> ACCEPTED: POST operation
+    ACCEPTED --> COMPLETED: Processing finished
+    note right of COMPLETED: result.outcome = SUCCESS | FAILED

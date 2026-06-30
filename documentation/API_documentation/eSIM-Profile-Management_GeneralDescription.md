@@ -77,15 +77,14 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 ## States of operations
 
-Asynchronous operations have three status values: `accepted`, `completed`, and `failed`. When an operation reaches `completed`, the `result.outcome` field carries the final outcome (`success` or `failed`).
+Asynchronous operations have two status values: `ACCEPTED` and `COMPLETED`. The `status` reflects the operation lifecycle only; when an operation reaches `COMPLETED`, the `result.outcome` field carries the final outcome (`SUCCESS` or `FAILED`).
 
 **Figure**: lifecycle of an operation
 
 ![Lifecycle of an operation](./diagrams/operation-lifecycle.png)
 
-- `accepted`: Operation queued for processing
-- `completed`: Operation finished (check `result.outcome` for the outcome)
-- `failed`: Operation could not be carried out during device-side execution
+- `ACCEPTED`: Operation queued for processing
+- `COMPLETED`: Operation finished (check `result.outcome` for `SUCCESS` or `FAILED`)
 
 
 
