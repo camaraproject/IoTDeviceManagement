@@ -148,6 +148,8 @@ paths:
           headers:
             x-correlator:
               $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+            Location:
+              $ref: '#/components/headers/Location'
           content:
             application/json:
               schema:
@@ -207,6 +209,8 @@ paths:
           headers:
             x-correlator:
               $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+            Location:
+              $ref: '#/components/headers/Location'
           content:
             application/json:
               schema:
@@ -267,6 +271,8 @@ paths:
           headers:
             x-correlator:
               $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+            Location:
+              $ref: '#/components/headers/Location'
           content:
             application/json:
               schema:
@@ -327,6 +333,8 @@ paths:
           headers:
             x-correlator:
               $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+            Location:
+              $ref: '#/components/headers/Location'
           content:
             application/json:
               schema:
@@ -395,6 +403,8 @@ paths:
           headers:
             x-correlator:
               $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+            Location:
+              $ref: '#/components/headers/Location'
           content:
             application/json:
               schema:
@@ -549,6 +559,16 @@ components:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
       description: OpenID Connect authentication
+
+  headers:
+    Location:
+      description: URL of the operation resource created to track this request, to be polled with GET /operations/{operationId}.
+      required: true
+      schema:
+        type: string
+        format: uri
+        maxLength: 256
+        example: "https://api.example.com/esim-profile-management/vwip/operations/550e8400-e29b-41d4-a716-446655440000"
 
   parameters:
     x-correlator:
