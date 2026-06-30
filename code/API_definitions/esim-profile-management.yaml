@@ -485,6 +485,8 @@ paths:
           $ref: '#/components/responses/Generic403'
         '404':
           $ref: '#/components/responses/Generic404'
+        '422':
+          $ref: '#/components/responses/Generic422'
 
   /operations/{operationId}:
     get:
