@@ -30,7 +30,7 @@ info:
 
     # Operation Lifecycle
 
-    1. **Download**: Install eSIM Profile to device in disabled state.
+    1. **Download**: Install eSIM Profile to device in DISABLED state.
     2. **Enable**: Enable downloaded eSIM Profile for connectivity (only one active per device)
     3. **Disable**: Disable eSIM Profile (device loses connectivity, eSIM Profile remains installed)
     4. **Delete**: Permanently remove eSIM Profile from device (irreversible)
@@ -55,6 +55,16 @@ info:
     - Terms and conditions including pricing
 
     This preparation phase is **outside the scope** of the eSIM Management API.
+
+    # Error Handling
+
+    All operations that require device interaction (download, enable, disable, delete, set-fallback) are asynchronous and return 202 with an operationId on acceptance. Errors are reported as follows:
+
+    - **Synchronous errors (immediate 4xx)**: Failures detectable without device interaction are returned immediately. This includes authentication failures (401), authorization failures (403), unknown identifiers (404), state-precondition violations (409), malformed requests (400), and inapplicable service (422).
+
+    - **Asynchronous failures (202 → status: failed)**: Failures that occur during device-side execution (e.g. device unreachable, OTA timeout, SM-DP+ error) are reported via the operation resource. Poll GET /operations/{operationId} to retrieve the outcome.
+
+    Operation status is retrieved by polling GET /operations/{operationId}. Event-based notifications are not supported in this version.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
     # Authorization and authentication
@@ -106,11 +116,11 @@ paths:
         - eSIM Profile Operations
       summary: Download eSIM Profile to device
       description: |
-        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in disabled state after successful download and ready for enabling.
+        Downloads and installs an eSIM Profile to a device. The eSIM Profile will be in DISABLED state after successful download and ready for enabling.
 
         **eSIM Profile Identification**: Requires EID (target device) and activationCode. The ICCID will be assigned during the download process and returned in the response.
 
-        **State Transition**: None → Disabled
+        **State Transition**: None → DISABLED
 
         **Required**: EID + activationCode
       operationId: downloadEsimProfile
@@ -166,7 +176,7 @@ paths:
 
         **eSIM Profile Identification**: Uses ICCID to identify the profile.
 
-        **State Transition**: Disabled → Enabled
+        **State Transition**: DISABLED → ENABLED
         **Required**: ICCID
       operationId: enableEsimProfile
       security:
@@ -208,6 +218,10 @@ paths:
           $ref: '#/components/responses/Generic401'
         '403':
           $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '409':
+          $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
 
@@ -219,7 +233,7 @@ paths:
       description: |
         Disables the currently enabled eSIM Profile. Device will lose cellular connectivity until another eSIM Profile is enabled. The eSIM Profile remains installed and can be re-enabled.
 
-        **State Transition**: Enabled → Disabled
+        **State Transition**: ENABLED → DISABLED
         **Required**: ICCID (identifies eSIM Profile and device)
       operationId: disableEsimProfile
       security:
@@ -261,6 +275,10 @@ paths:
           $ref: '#/components/responses/Generic401'
         '403':
           $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '409':
+          $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
 
@@ -270,9 +288,9 @@ paths:
         - eSIM Profile Operations
       summary: Delete eSIM Profile
       description: |
-        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in disabled state before deletion.
+        Permanently removes an eSIM Profile from the device. This operation is irreversible and the profile cannot be recovered. The profile must be in DISABLED state before deletion.
 
-        **State Transition**: Disabled → Deleted (removed)
+        **State Transition**: DISABLED → Deleted (removed)
         **Required**: ICCID (identifies eSIM Profile and device)
       operationId: deleteEsimProfile
       security:
@@ -314,6 +332,10 @@ paths:
           $ref: '#/components/responses/Generic401'
         '403':
           $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '409':
+          $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
 
@@ -323,14 +345,14 @@ paths:
         - eSIM Profile Operations
       summary: Set fallback eSIM Profile
       description: |
-        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in disabled state.
+        Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in DISABLED state.
 
         **State Transition**: No state change (sets attribute only)
         **Required**: ICCID (identifies eSIM Profile to designate as fallback)
       operationId: setFallbackEsimProfile
       security:
         - openId:
-            - iot-device-management:esim-profiles:enable
+            - iot-device-management:esim-profiles:set-fallback
       parameters:
         - $ref: '#/components/parameters/x-correlator'
       requestBody:
@@ -367,6 +389,10 @@ paths:
           $ref: '#/components/responses/Generic401'
         '403':
           $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
+        '409':
+          $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
 
@@ -378,11 +404,13 @@ paths:
       description: |
         Retrieves current status and state information for eSIM Profiles.
 
+        This operation uses POST despite being a read operation. Device identifiers (EID/ICCID) are passed in the request body rather than as URL parameters to prevent their exposure in server logs, proxy caches, and browser history.
+
         **eSIM Profile Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
       operationId: getEsimProfileStatus
       security:
         - openId:
-            - iot-device-management:esim-profiles:read
+            - iot-device-management:esim-profiles:retrieve-status
       requestBody:
         required: true
         content:
@@ -413,11 +441,11 @@ paths:
                     esimProfiles:
                       - eid: "89049032000000000000000000000001"
                         iccid: "8901260123456789012"
-                        state: "enabled"
+                        state: "ENABLED"
                         isFallback: false
                       - eid: "89049032000000000000000000000001"
                         iccid: "8901260123456789013"
-                        state: "disabled"
+                        state: "DISABLED"
                         isFallback: true
         '400':
           $ref: '#/components/responses/Generic400'
@@ -440,7 +468,7 @@ paths:
       operationId: retrieveOperation
       security:
         - openId:
-            - iot-device-management:esim-profiles:read
+            - iot-device-management:esim-profiles:retrieve-operation
       parameters:
         - $ref: '#/components/parameters/x-correlator'
         - name: operationId
@@ -470,6 +498,7 @@ paths:
                     result:
                       completedAt: "2024-01-15T10:30:00Z"
                       outcome: "success"
+                      assignedIccid: "8901260123456789012"
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -483,24 +512,14 @@ components:
   securitySchemes:
     openId:
       type: openIdConnect
-      openIdConnectUrl: https://example.com/.well-known/openid_configuration
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
       description: OpenID Connect authentication
 
   parameters:
     x-correlator:
-      name: x-correlator
-      in: header
-      description: Correlation id for the different services
-      schema:
-        $ref: '#/components/schemas/XCorrelator'
+      $ref: '../common/CAMARA_common.yaml#/components/parameters/x-correlator'
 
   schemas:
-    XCorrelator:
-      type: string
-      maxLength: 256
-      pattern: ^[a-zA-Z0-9-_:;.\\/<>{}]{0,256}$
-      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
-      description: Correlation identifier
 
     # eSIM Profile Identifier Schemas
     ESimProfileEid:
@@ -611,6 +630,31 @@ components:
       required:
         - esimProfile
 
+    ESimProfileOperationResult:
+      type: object
+      description: Result details for a completed or failed operation
+      properties:
+        completedAt:
+          type: string
+          format: date-time
+          maxLength: 64
+          description: Timestamp when the operation completed. Must follow RFC 3339.
+        outcome:
+          type: string
+          enum: [success, failed]
+          description: Final outcome of the operation
+        failureReason:
+          type: string
+          maxLength: 256
+          description: Human-readable failure reason (present when outcome is failed)
+        assignedIccid:
+          allOf:
+            - $ref: '#/components/schemas/ESimProfileIccid'
+          description: ICCID assigned during download (present for successful download operations)
+      required:
+        - completedAt
+        - outcome
+
     ESimProfileResponse:
       type: object
       description: Unified response for all eSIM Profile operations
@@ -631,8 +675,7 @@ components:
         esimProfile:
           $ref: '#/components/schemas/ESimProfile'
         result:
-          type: object
-          description: Operation-specific result data (when completed)
+          $ref: '#/components/schemas/ESimProfileOperationResult'
       required:
         - operationId
         - operation
@@ -656,7 +699,7 @@ components:
                 $ref: '#/components/schemas/ESimProfileIccid'
               state:
                 type: string
-                enum: [enabled, disabled]
+                enum: [ENABLED, DISABLED]
                 description: Current state of the eSIM Profile
               isFallback:
                 type: boolean
@@ -670,151 +713,27 @@ components:
       required:
         - esimProfiles
 
-    ErrorInfo:
-      type: object
-      description: Error information
-      properties:
-        status:
-          type: integer
-          format: int32
-          minimum: -2147483648
-          maximum: 2147483647
-          description: HTTP status code
-        code:
-          type: string
-          maxLength: 64
-          description: Error code
-        message:
-          type: string
-          maxLength: 256
-          description: Error message
-        details:
-          type: string
-          maxLength: 512
-          description: Additional error details
-      required:
-        - status
-        - code
-        - message
-
   responses:
     Generic400:
-      description: Bad Request
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 400
-                  code:
-                    enum:
-                      - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
-          examples:
-            GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic400'
     Generic401:
-      description: Unauthorized
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 401
-                  code:
-                    enum:
-                      - UNAUTHENTICATED
-          examples:
-            GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new authentication is required
-              value:
-                status: 401
-                code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
     Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
     Generic404:
-      description: Not Found
-      headers:
-        x-correlator:
-          $ref: '#/components/parameters/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 404
-                  code:
-                    enum:
-                      - NOT_FOUND
-                      - IDENTIFIER_NOT_FOUND
-          examples:
-            GENERIC_404_NOT_FOUND:
-              description: Resource is not found
-              value:
-                status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic404'
+    Generic409:
+      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic409'
     Generic422:
       description: Unprocessable Content
       headers:
         x-correlator:
-          $ref: '#/components/parameters/x-correlator'
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/ErrorInfo'
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -823,13 +742,10 @@ components:
                   code:
                     enum:
                       - SERVICE_NOT_APPLICABLE
-                      - MISSING_IDENTIFIER
-                      - UNSUPPORTED_IDENTIFIER
-                      - UNNECESSARY_IDENTIFIER
           examples:
-            GENERIC_422_MISSING_IDENTIFIER:
-              description: An identifier is not included in the request and the device identification cannot be derived from the access token
+            GENERIC_422_SERVICE_NOT_APPLICABLE:
+              description: Service not applicable for the provided identifier
               value:
                 status: 422
-                code: MISSING_IDENTIFIER
-                message: The device cannot be identified.
+                code: SERVICE_NOT_APPLICABLE
+                message: The service is not available for the provided identifier.
