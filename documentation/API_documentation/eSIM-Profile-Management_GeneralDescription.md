@@ -36,18 +36,7 @@ The status and results of an asynchronous operation are retrieved by polling the
 
 **Figure**: High-level sequence of steps
 
-```mermaid
-    graph TD
-    0[Complete Pre-requisites]
-    A[Download eSIM Profile to Device]
-    B[Enable eSIM Profile]
-    C[Configure Fallback Profile - Optional]
-    D[Device has active connectivity with backup option]
-    0 --> A
-    A --> B
-    B --> C
-    C --> D
-```
+![High-level sequence of steps](./diagrams/high-level-steps.png)
 
 ## Pre-requisites
 
@@ -64,47 +53,7 @@ eSIM Profile Management APIs currently do not support procurement of eSIM Profil
 
 ## High-level flow
 
-```mermaid
-sequenceDiagram
-    participant App as API Consumer (Application)
-    participant API as eSIM Profile Management API
-    participant RSP as RSP Platform
-    participant Device as eSIM Device
-    Note over App,Device: Pre-requisites completed
-
-    rect rgba(240, 240, 240, 0.3)
-        note right of App: 1: Download eSIM Profile
-        App->>API: POST /esim-profile-management/download (eid, activationCode)
-        API->>App: 202 Accepted (operationId)
-        API<<->>RSP: eSIM Profile provisioning operations (e.g., SGP.32 Download Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
-        RSP<<->>Device: OTA Profile Download and Installation
-        App->>API: GET /esim-profile-management/operations/{operationId}
-        API-->>App: 200 OK (operationId, status=completed, assignedIccid)
-    end
-
-    rect rgba(240, 240, 240, 0.3)
-        note right of App: 2: Enable eSIM Profile
-        App->>API: POST /esim-profile-management/enable (iccid)
-        API->>App: 202 Accepted (operationId)
-        API<<->>RSP: eSIM Profile enabling operations (e.g., SGP.32 Enable Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
-        RSP<<->>Device: OTA Profile Enabling
-        App->>API: GET /esim-profile-management/operations/{operationId}
-        API-->>App: 200 OK (operationId, status=completed)
-    end
-
-    rect rgba(240, 240, 240, 0.3)
-        note right of App: 3: Configure Fallback (Optional)
-        App->>API: POST /esim-profile-management/set-fallback (iccid)
-        API->>App: 202 Accepted (operationId)
-        API<<->>RSP: eSIM Profile fallback configuration (e.g., SGP.32 Set Fallback Attribute PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
-        App->>API: GET /esim-profile-management/operations/{operationId}
-        API-->>App: 200 OK (operationId, status=completed)
-    end
-
-    Note over App,Device: 4: Device has active connectivity with fallback
-    Device-->>RSP: Connect using enabled eSIM Profile
-    RSP-->>Device: Connectivity established
-```
+![High-level flow](./diagrams/high-level-flow.png)
 
 Main steps:
 
@@ -119,14 +68,7 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 **Figure**: lifecycle of an eSIM Profile
 
-```mermaid
-stateDiagram-v2
-    [*] --> DISABLED: Download eSIM Profile
-    DISABLED --> ENABLED: Enable eSIM Profile
-    ENABLED --> DISABLED: Disable eSIM Profile
-    DISABLED --> [*]: Delete eSIM Profile
-    ENABLED --> [*]: Delete eSIM Profile (auto-disable first)
-```
+![Lifecycle of an eSIM Profile](./diagrams/esim-profile-lifecycle.png)
 
 - DISABLED: eSIM Profile installed but not active
 - ENABLED: eSIM Profile active and providing connectivity
@@ -139,13 +81,7 @@ Asynchronous operations have three status values: `accepted`, `completed`, and `
 
 **Figure**: lifecycle of an operation
 
-```mermaid
-stateDiagram-v2
-    [*] --> accepted: POST operation
-    accepted --> completed: Processing finished
-    accepted --> failed: Device-side execution failed
-    note right of completed: result.outcome = success | failed
-```
+![Lifecycle of an operation](./diagrams/operation-lifecycle.png)
 
 - `accepted`: Operation queued for processing
 - `completed`: Operation finished (check `result.outcome` for the outcome)

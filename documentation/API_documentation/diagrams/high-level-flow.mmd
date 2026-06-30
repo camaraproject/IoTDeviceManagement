@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant App as API Consumer (Application)
+    participant API as eSIM Profile Management API
+    participant RSP as RSP Platform
+    participant Device as eSIM Device
+    Note over App,Device: Pre-requisites completed
+
+    rect rgba(240, 240, 240, 0.3)
+        note right of App: 1: Download eSIM Profile
+        App->>API: POST /esim-profile-management/download (eid, activationCode)
+        API->>App: 202 Accepted (operationId)
+        API<<->>RSP: eSIM Profile provisioning operations (e.g., SGP.32 Download Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
+        RSP<<->>Device: OTA Profile Download and Installation
+        App->>API: GET /esim-profile-management/operations/{operationId}
+        API-->>App: 200 OK (operationId, status=completed, assignedIccid)
+    end
+
+    rect rgba(240, 240, 240, 0.3)
+        note right of App: 2: Enable eSIM Profile
+        App->>API: POST /esim-profile-management/enable (iccid)
+        API->>App: 202 Accepted (operationId)
+        API<<->>RSP: eSIM Profile enabling operations (e.g., SGP.32 Enable Profile PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
+        RSP<<->>Device: OTA Profile Enabling
+        App->>API: GET /esim-profile-management/operations/{operationId}
+        API-->>App: 200 OK (operationId, status=completed)
+    end
+
+    rect rgba(240, 240, 240, 0.3)
+        note right of App: 3: Configure Fallback (Optional)
+        App->>API: POST /esim-profile-management/set-fallback (iccid)
+        API->>App: 202 Accepted (operationId)
+        API<<->>RSP: eSIM Profile fallback configuration (e.g., SGP.32 Set Fallback Attribute PSMO)<br>Managed by API Provider and Network Provider<br>Outside scope of eSIM Profile Management APIs
+        App->>API: GET /esim-profile-management/operations/{operationId}
+        API-->>App: 200 OK (operationId, status=completed)
+    end
+
+    Note over App,Device: 4: Device has active connectivity with fallback
+    Device-->>RSP: Connect using enabled eSIM Profile
+    RSP-->>Device: Connectivity established
