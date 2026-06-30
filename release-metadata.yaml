@@ -2,7 +2,7 @@ repository:
   repository_name: IoTDeviceManagement
   release_tag: r1.1
   release_type: pre-release-alpha
-  release_date: null
+  release_date: '2026-06-30T07:59:56Z'
   src_commit_sha: c924333eba96bbb1b985efc7b24f59a97e5d83e2
 apis:
 - api_name: esim-profile-management
