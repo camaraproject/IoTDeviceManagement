@@ -23,12 +23,12 @@ The API operations are summarized in the table below:
 
 | **Operation** | **Purpose of the Operation** | **Key Abstractions and concepts** |
 | ---- | ------- | ----|
-| Download eSIM Profile | Download and install new eSIM Profile to device | An eSIM Profile represents a downloadable connectivity configuration that can be installed on eSIM hardware (eUICC). The download operation combines SGP.32 Profile Download and Installation into a single operation resulting in a "Disabled" eSIM Profile ready for enabling. Optional `activateOnDownload` parameter enables immediate enabling after successful download. |
+| Download eSIM Profile | Download and install new eSIM Profile to device | An eSIM Profile represents a downloadable connectivity configuration that can be installed on eSIM hardware (eUICC). The download operation combines SGP.32 Profile Download and Installation into a single operation resulting in a DISABLED eSIM Profile ready for enabling. Optional `activateOnDownload` parameter enables immediate enabling after successful download. |
 | Enable eSIM Profile | Enable an eSIM Profile which is already downloaded on the device | eSIM Profile Enabling makes an installed eSIM Profile active for cellular connectivity (assuming valid connectivity services are configured in the eSIM Profile). Only one eSIM Profile can be enabled per device - enabling an eSIM Profile automatically disables any currently active eSIM Profile. |
 | Disable eSIM Profile | Disable active eSIM Profile | eSIM Profile Disabling makes an active eSIM Profile inactive, removing cellular connectivity until another eSIM Profile is enabled. The eSIM Profile remains installed and can be re-enabled. |
-| Delete eSIM Profile | Permanently remove eSIM Profile from device | eSIM Profile Deletion permanently removes an eSIM Profile from the device. This operation is irreversible and the eSIM Profile cannot be recovered. The eSIM Profile must be in disabled state before deletion. |
+| Delete eSIM Profile | Permanently remove eSIM Profile from device | eSIM Profile Deletion permanently removes an eSIM Profile from the device. This operation is irreversible and the eSIM Profile cannot be recovered. The eSIM Profile must be in DISABLED state before deletion. |
 | Set Fallback eSIM Profile | Configure backup eSIM Profile | Fallback Configuration designates a backup eSIM Profile that can be automatically activated if the primary eSIM Profile fails or becomes unavailable, ensuring service continuity. |
-| Retrieve Status | Query current status of eSIM Profiles on device | eSIM Profile Status provides current state information for all eSIM Profiles on a device, including active, disabled, and fallback eSIM Profile identification. |
+| Retrieve Status | Query current status of eSIM Profiles on device | eSIM Profile Status provides current state information for all eSIM Profiles on a device, including ENABLED, DISABLED, and fallback eSIM Profile identification. |
 
 All operations are asynchronous, returning an `operationId` for tracking.
 
@@ -136,11 +136,11 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Disabled: Download eSIM Profile
-    Disabled --> Enabled: Enable eSIM Profile
-    Enabled --> Disabled: Disable eSIM Profile
-    Disabled --> [*]: Delete eSIM Profile
-    Enabled --> [*]: Delete eSIM Profile (auto-disable first)
+    [*] --> DISABLED: Download eSIM Profile
+    DISABLED --> ENABLED: Enable eSIM Profile
+    ENABLED --> DISABLED: Disable eSIM Profile
+    DISABLED --> [*]: Delete eSIM Profile
+    ENABLED --> [*]: Delete eSIM Profile (auto-disable first)
 ```
 
 - DISABLED: eSIM Profile installed but not active
