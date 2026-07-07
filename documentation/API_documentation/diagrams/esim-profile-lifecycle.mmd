@@ -1,0 +1,6 @@
+stateDiagram-v2
+    [*] --> DISABLED: Download eSIM Profile
+    DISABLED --> ENABLED: Enable eSIM Profile
+    ENABLED --> DISABLED: Disable eSIM Profile
+    DISABLED --> [*]: Delete eSIM Profile
+    ENABLED --> [*]: Delete eSIM Profile (auto-disable first)

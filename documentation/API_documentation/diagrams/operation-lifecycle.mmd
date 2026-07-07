@@ -1,0 +1,4 @@
+stateDiagram-v2
+    [*] --> ACCEPTED: POST operation
+    ACCEPTED --> COMPLETED: Processing finished
+    note right of COMPLETED: result.outcome = SUCCESS | FAILED
