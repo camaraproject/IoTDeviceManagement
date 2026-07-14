@@ -91,24 +91,20 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
+  version: 0.1.0-rc.1
   x-camara-commonalities: 0.8.0
-
 servers:
-  - url: "{apiRoot}/esim-profile-management/vwip"
+  - url: '{apiRoot}/esim-profile-management/v0.1rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
-        description: "API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`"
-
+        description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
 tags:
   - name: eSIM Profile Operations
     description: Lifecycle management operations for eSIM profiles
-
 paths:
   /download:
     post:
@@ -140,14 +136,14 @@ paths:
                 summary: Download eSIM Profile to device
                 value:
                   esimProfile:
-                    eid: "89049032000000000000000000000001"
-                  activationCode: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
+                    eid: '89049032000000000000000000000001'
+                  activationCode: LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815
       responses:
         '202':
           description: Download request accepted
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
             Location:
               $ref: '#/components/headers/Location'
           content:
@@ -157,11 +153,11 @@ paths:
               examples:
                 download_accepted:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440000"
-                    operation: "download"
-                    status: "ACCEPTED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440000
+                    operation: download
+                    status: ACCEPTED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
+                      eid: '89049032000000000000000000000001'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -172,7 +168,6 @@ paths:
           $ref: '#/components/responses/Generic404'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /enable:
     post:
       tags:
@@ -202,13 +197,13 @@ paths:
                 summary: Enable eSIM Profile
                 value:
                   esimProfile:
-                    iccid: "8901260123456789012"
+                    iccid: '8901260123456789012'
       responses:
         '202':
           description: Enable request accepted
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
             Location:
               $ref: '#/components/headers/Location'
           content:
@@ -218,12 +213,12 @@ paths:
               examples:
                 enable_accepted:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440001"
-                    operation: "enable"
-                    status: "ACCEPTED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440001
+                    operation: enable
+                    status: ACCEPTED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789012"
+                      eid: '89049032000000000000000000000001'
+                      iccid: '8901260123456789012'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -236,7 +231,6 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /disable:
     post:
       tags:
@@ -264,13 +258,13 @@ paths:
                 summary: Disable eSIM Profile
                 value:
                   esimProfile:
-                    iccid: "8901260123456789012"
+                    iccid: '8901260123456789012'
       responses:
         '202':
           description: Disable request accepted
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
             Location:
               $ref: '#/components/headers/Location'
           content:
@@ -280,12 +274,12 @@ paths:
               examples:
                 disable_accepted:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440002"
-                    operation: "disable"
-                    status: "ACCEPTED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440002
+                    operation: disable
+                    status: ACCEPTED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789012"
+                      eid: '89049032000000000000000000000001'
+                      iccid: '8901260123456789012'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -298,7 +292,6 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /delete:
     post:
       tags:
@@ -326,13 +319,13 @@ paths:
                 summary: Delete eSIM Profile
                 value:
                   esimProfile:
-                    iccid: "8901260123456789012"
+                    iccid: '8901260123456789012'
       responses:
         '202':
           description: Delete request accepted
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
             Location:
               $ref: '#/components/headers/Location'
           content:
@@ -342,12 +335,12 @@ paths:
               examples:
                 delete_accepted:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440003"
-                    operation: "delete"
-                    status: "ACCEPTED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440003
+                    operation: delete
+                    status: ACCEPTED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789012"
+                      eid: '89049032000000000000000000000001'
+                      iccid: '8901260123456789012'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -360,7 +353,6 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /set-fallback:
     post:
       tags:
@@ -390,19 +382,19 @@ paths:
                 summary: Set eSIM Profile as fallback (ICCID only)
                 value:
                   esimProfile:
-                    iccid: "8901260123456789013"
+                    iccid: '8901260123456789013'
               set_fallback_with_eid:
                 summary: Set eSIM Profile as fallback on a specific eUICC (EID + ICCID)
                 value:
                   esimProfile:
-                    eid: "89049032000000000000000000000001"
-                    iccid: "8901260123456789013"
+                    eid: '89049032000000000000000000000001'
+                    iccid: '8901260123456789013'
       responses:
         '202':
           description: Set fallback request accepted
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
             Location:
               $ref: '#/components/headers/Location'
           content:
@@ -412,12 +404,12 @@ paths:
               examples:
                 set_fallback_accepted:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440004"
-                    operation: "set-fallback"
-                    status: "ACCEPTED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440004
+                    operation: set-fallback
+                    status: ACCEPTED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789013"
+                      eid: '89049032000000000000000000000001'
+                      iccid: '8901260123456789013'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -430,7 +422,6 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /retrieve-status:
     post:
       tags:
@@ -459,18 +450,18 @@ paths:
                 summary: Query status by EID
                 value:
                   esimProfile:
-                    eid: "89049032000000000000000000000001"
+                    eid: '89049032000000000000000000000001'
               query_by_iccid:
                 summary: Query status by ICCID
                 value:
                   esimProfile:
-                    iccid: "8901260123456789012"
+                    iccid: '8901260123456789012'
       responses:
         '200':
           description: eSIM Profile status retrieved successfully
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -479,13 +470,13 @@ paths:
                 device_status:
                   value:
                     esimProfiles:
-                      - eid: "89049032000000000000000000000001"
-                        iccid: "8901260123456789012"
-                        state: "ENABLED"
+                      - eid: '89049032000000000000000000000001'
+                        iccid: '8901260123456789012'
+                        state: ENABLED
                         isFallback: false
-                      - eid: "89049032000000000000000000000001"
-                        iccid: "8901260123456789013"
-                        state: "DISABLED"
+                      - eid: '89049032000000000000000000000001'
+                        iccid: '8901260123456789013'
+                        state: DISABLED
                         isFallback: true
         '400':
           $ref: '#/components/responses/Generic400'
@@ -497,7 +488,6 @@ paths:
           $ref: '#/components/responses/Generic404'
         '422':
           $ref: '#/components/responses/Generic422'
-
   /operations/{operationId}:
     get:
       tags:
@@ -519,14 +509,14 @@ paths:
           schema:
             type: string
             maxLength: 64
-            pattern: '^[a-zA-Z0-9-_:.]+$'
+            pattern: ^[a-zA-Z0-9-_:.]+$
           description: Operation identifier from original operation
       responses:
         '200':
           description: Operation information retrieved successfully
           headers:
             x-correlator:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
@@ -534,16 +524,16 @@ paths:
               examples:
                 operation_result:
                   value:
-                    operationId: "550e8400-e29b-41d4-a716-446655440000"
-                    operation: "download"
-                    status: "COMPLETED"
+                    operationId: 550e8400-e29b-41d4-a716-446655440000
+                    operation: download
+                    status: COMPLETED
                     esimProfile:
-                      eid: "89049032000000000000000000000001"
-                      iccid: "8901260123456789012"
+                      eid: '89049032000000000000000000000001'
+                      iccid: '8901260123456789012'
                     result:
-                      completedAt: "2024-01-15T10:30:00Z"
-                      outcome: "SUCCESS"
-                      assignedIccid: "8901260123456789012"
+                      completedAt: '2024-01-15T10:30:00Z'
+                      outcome: SUCCESS
+                      assignedIccid: '8901260123456789012'
         '400':
           $ref: '#/components/responses/Generic400'
         '401':
@@ -552,14 +542,12 @@ paths:
           $ref: '#/components/responses/Generic403'
         '404':
           $ref: '#/components/responses/Generic404'
-
 components:
   securitySchemes:
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
       description: OpenID Connect authentication
-
   headers:
     Location:
       description: URL of the operation resource created to track this request, to be polled with GET /operations/{operationId}.
@@ -568,30 +556,31 @@ components:
         type: string
         format: uri
         maxLength: 256
-        example: "https://api.example.com/esim-profile-management/vwip/operations/550e8400-e29b-41d4-a716-446655440000"
-
+        example: https://api.example.com/esim-profile-management/v0.1rc1/operations/550e8400-e29b-41d4-a716-446655440000
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
   parameters:
     x-correlator:
-      $ref: '../common/CAMARA_common.yaml#/components/parameters/x-correlator'
-
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
   schemas:
-
-    # eSIM Profile Identifier Schemas
     ESimProfileEid:
       type: string
       maxLength: 32
-      pattern: '^[0-9]{32}$'
+      pattern: ^[0-9]{32}$
       description: eUICC Identifier (EID) - 32 decimal digits per SGP.22 v3.1 specification
-      example: "89049032000000000000000000000001"
-
+      example: '89049032000000000000000000000001'
     ESimProfileIccid:
       type: string
       maxLength: 20
-      pattern: '^[0-9]{19,20}$'
+      pattern: ^[0-9]{19,20}$
       description: Integrated Circuit Card Identifier (ICCID) - eSIM Profile identifier per ITU-T E.118
-      example: "8901260123456789012"
-
-    # eSIM Profile Schema - Flexible identification
+      example: '8901260123456789012'
     ESimProfile:
       type: object
       description: |
@@ -604,27 +593,27 @@ components:
           $ref: '#/components/schemas/ESimProfileEid'
         iccid:
           $ref: '#/components/schemas/ESimProfileIccid'
-
     ESimProfileForDownload:
       allOf:
         - $ref: '#/components/schemas/ESimProfile'
-        - required: [eid]
+        - required:
+            - eid
       description: eSIM Profile identification for download operations (requires only EID, ICCID will be assigned during download)
-
     ESimProfileForOperation:
       allOf:
         - $ref: '#/components/schemas/ESimProfile'
-        - required: [iccid]
+        - required:
+            - iccid
       description: eSIM Profile identification for enable/disable/delete/set-fallback operations (requires only ICCID)
-
     ESimProfileForStatus:
       allOf:
         - $ref: '#/components/schemas/ESimProfile'
         - anyOf:
-            - required: [eid]
-            - required: [iccid]
+            - required:
+                - eid
+            - required:
+                - iccid
       description: eSIM Profile identification for status operations (requires either EID or ICCID)
-    # Request schemas using new eSIM Profile identification
     DownloadEsimProfileRequest:
       type: object
       description: Request to download eSIM Profile
@@ -635,11 +624,10 @@ components:
           type: string
           maxLength: 256
           description: Profile activation code (LPA format)
-          example: "LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815"
+          example: LPA:1$SM-DP+.EXAMPLE.COM$04386-AGYFT-A74Y8-3F815
       required:
         - esimProfile
         - activationCode
-
     EnableEsimProfileRequest:
       type: object
       description: Request to enable eSIM Profile
@@ -648,7 +636,6 @@ components:
           $ref: '#/components/schemas/ESimProfileForOperation'
       required:
         - esimProfile
-
     DisableEsimProfileRequest:
       type: object
       description: Request to disable eSIM Profile
@@ -657,7 +644,6 @@ components:
           $ref: '#/components/schemas/ESimProfileForOperation'
       required:
         - esimProfile
-
     DeleteEsimProfileRequest:
       type: object
       description: Request to delete eSIM Profile
@@ -666,7 +652,6 @@ components:
           $ref: '#/components/schemas/ESimProfileForOperation'
       required:
         - esimProfile
-
     SetFallbackEsimProfileRequest:
       type: object
       description: Request to set eSIM Profile as fallback
@@ -675,7 +660,6 @@ components:
           $ref: '#/components/schemas/ESimProfileForOperation'
       required:
         - esimProfile
-
     QueryEsimProfileStatusRequest:
       type: object
       description: Request to query eSIM Profile status
@@ -684,7 +668,6 @@ components:
           $ref: '#/components/schemas/ESimProfileForStatus'
       required:
         - esimProfile
-
     ESimProfileOperationResult:
       type: object
       description: Result details for a completed or failed operation
@@ -696,7 +679,9 @@ components:
           description: Timestamp when the operation completed. Must follow RFC 3339.
         outcome:
           type: string
-          enum: [SUCCESS, FAILED]
+          enum:
+            - SUCCESS
+            - FAILED
           description: Final outcome of the operation
         failureReason:
           type: string
@@ -709,7 +694,6 @@ components:
       required:
         - completedAt
         - outcome
-
     ESimProfileResponse:
       type: object
       description: Unified response for all eSIM Profile operations
@@ -717,15 +701,22 @@ components:
         operationId:
           type: string
           maxLength: 64
-          pattern: '^[a-zA-Z0-9-_:.]+$'
+          pattern: ^[a-zA-Z0-9-_:.]+$
           description: Unique identifier for tracking the operation
         operation:
           type: string
-          enum: [download, enable, disable, delete, set-fallback]
+          enum:
+            - download
+            - enable
+            - disable
+            - delete
+            - set-fallback
           description: Type of operation performed
         status:
           type: string
-          enum: [ACCEPTED, COMPLETED]
+          enum:
+            - ACCEPTED
+            - COMPLETED
           description: |
             Lifecycle status of the operation: `ACCEPTED` while in progress, `COMPLETED` once processing has finished. The outcome of a completed operation (success or failure) is carried in `result.outcome`.
         esimProfile:
@@ -739,7 +730,6 @@ components:
         - operation
         - status
         - esimProfile
-
     EsimProfileStatusResponse:
       type: object
       description: Response containing eSIM Profile status information
@@ -757,7 +747,9 @@ components:
                 $ref: '#/components/schemas/ESimProfileIccid'
               state:
                 type: string
-                enum: [ENABLED, DISABLED]
+                enum:
+                  - ENABLED
+                  - DISABLED
                 description: Current state of the eSIM Profile
               isFallback:
                 type: boolean
@@ -770,28 +762,213 @@ components:
           description: All eSIM Profiles available on the device
       required:
         - esimProfiles
-
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
   responses:
     Generic400:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic400'
-    Generic401:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
-    Generic403:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
-    Generic404:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic404'
-    Generic409:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic409'
-    Generic422:
-      description: Unprocessable Content
+      description: Bad Request
       headers:
         x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
+            GENERIC_400_OUT_OF_RANGE:
+              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
+              value:
+                status: 400
+                code: OUT_OF_RANGE
+                message: Client specified an invalid range.
+    Generic401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              description: Request cannot be authenticated and a new authentication is required
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
+    Generic403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
+            GENERIC_403_INVALID_TOKEN_CONTEXT:
+              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
+              value:
+                status: 403
+                code: INVALID_TOKEN_CONTEXT
+                message: Request body is not consistent with access token.
+    Generic404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+                      - IDENTIFIER_NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: Resource is not found
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
+            GENERIC_404_IDENTIFIER_NOT_FOUND:
+              description: Some identifier cannot be matched to a device
+              value:
+                status: 404
+                code: IDENTIFIER_NOT_FOUND
+                message: Device identifier not found.
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - ABORTED
+                      - ALREADY_EXISTS
+                      - CONFLICT
+                      - INCOMPATIBLE_STATE
+          examples:
+            GENERIC_409_ABORTED:
+              description: The resource is undergoing modification by another process
+              value:
+                status: 409
+                code: ABORTED
+                message: Resource is being modified by another operation. Please wait, and retry if appropriate.
+            GENERIC_409_ALREADY_EXISTS:
+              description: Trying to create an existing resource
+              value:
+                status: 409
+                code: ALREADY_EXISTS
+                message: The resource that a client tried to create already exists.
+            GENERIC_409_CONFLICT:
+              description: Duplication of an existing resource
+              value:
+                status: 409
+                code: CONFLICT
+                message: A specified resource duplicate entry found.
+            GENERIC_409_INCOMPATIBLE_STATE:
+              description: |
+                The status of the referenced resource is not compatible.
+              value:
+                status: 409
+                code: INCOMPATIBLE_STATE
+                message: Resource must be in AVAILABLE state to extend. Current state is UNAVAILABLE.
+    Generic422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
