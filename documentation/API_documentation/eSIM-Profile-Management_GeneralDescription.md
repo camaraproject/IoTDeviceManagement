@@ -49,6 +49,8 @@ Before using the eSIM Profile Management API, the API Consumer must establish a 
 
 This preparation phase is **outside the scope** of the eSIM Profile Management API.
 
+**Device connectivity**: All operations act on the device over-the-air (download, enable, disable, delete, set-fallback). The target device must therefore be reachable over cellular or Wi-Fi when an operation runs. Download is the notable case. Because it may deliver the device's first eSIM Profile, that initial connectivity has to come from another bearer, such as an existing profile, a bootstrap profile, or Wi-Fi. The API does not provide this connectivity itself. A device that cannot be reached at all cannot be operated on through it. If the device becomes unreachable mid-operation, the operation completes with a `FAILED` outcome rather than being rejected synchronously.
+
 eSIM Profile Management APIs currently do not support procurement of eSIM Profiles and such a capability may be added in future revisions.
 
 ## High-level flow

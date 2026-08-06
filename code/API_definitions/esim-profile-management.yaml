@@ -56,6 +56,8 @@ info:
 
     This preparation phase is **outside the scope** of the eSIM Profile Management API.
 
+    All operations act on the device over-the-air (download, enable, disable, delete, set-fallback). The target device must therefore be reachable, with working IP connectivity, when an operation runs. Download is the notable case. It may deliver the device's first eSIM Profile, so that initial connectivity has to come from another bearer, such as an existing profile, a bootstrap profile, or Wi-Fi. This API does not provide that connectivity. If the device is not reachable while an operation runs, the operation completes with a `FAILED` outcome (see Error Handling), rather than being rejected up front.
+
     # Error Handling
 
     All operations that require device interaction (download, enable, disable, delete, set-fallback) are asynchronous and return 202 with an operationId on acceptance. Errors are reported as follows:

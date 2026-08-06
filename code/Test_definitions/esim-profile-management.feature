@@ -5,6 +5,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
   # * apiRoot: API root of the server URL
   #
   # Testing assets:
+  # * The target device is reachable (has working IP connectivity) throughout the operation
   # * A valid EID for a device with an eUICC
   # * A valid activation code for downloading an eSIM Profile
   # * A valid ICCID for an existing downloaded eSIM Profile (disabled state)
