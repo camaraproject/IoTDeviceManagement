@@ -96,13 +96,22 @@ Asynchronous operations have two status values: `ACCEPTED` and `COMPLETED`. The 
 
 
 **Usage:**
-- Enable/disable/delete/set-fallback require ICCID; EID may also be supplied to scope the operation to a specific eUICC
+- Enable/disable/delete/set-fallback require ICCID; the EID may also be supplied (see below)
 - Download requires EID (device targeting); the ICCID is assigned during download
-- Status retrieval accepts either EID (all profiles on the device) or ICCID (a specific profile)
+- Status retrieval accepts the EID (all profiles on the device), the ICCID (a specific profile), or both (see below)
 
-These are the mandatory identifiers per operation. In addition, a specific implementation may require both the EID and the ICCID to be passed together (e.g. to scope an operation to a particular device), even where only one is mandated above.
+These are the mandatory identifiers per operation. The optional EID is discussed below; note that a specific implementation may additionally require the EID even where only the ICCID is mandated above.
 
 For set-fallback in particular, the ICCID identifies the target eSIM Profile to designate as fallback, while the EID, when supplied, identifies the eUICC on which to set it.
+
+**When and why a consumer supplies both identifiers**
+
+Supplying both the EID and the ICCID together is always optional; providing only the mandatory identifier for an operation is fully supported. The ICCID identifies the target eSIM Profile, so the EID is not normally needed to determine which profile is meant. A consumer that has downloaded a profile already holds both identifiers — the EID it supplied at download and the ICCID returned in the response — so supplying the second identifier is never a means to discover an unknown value. It serves two purposes:
+
+- **Routing.** The API provider may not immediately know which device currently holds a given ICCID, and resolving that mapping can require additional interaction with the device. IoT deployments often avoid such interaction routinely to conserve device data and energy. Supplying the EID lets the provider route the operation to the target device directly, rather than resolving the ICCID first.
+- **Defensive assertion.** Supplying both asks the provider to confirm the pairing before acting: if the ICCID is not installed on the identified device, the request is rejected rather than applied to an unintended target.
+
+For status retrieval specifically: supplying only the EID returns all profiles on the device, supplying only the ICCID returns that single profile, and supplying both returns that profile subject to the same pairing assertion.
 
 When both an EID and an ICCID are provided and each is individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`. Note that `404 IDENTIFIER_NOT_FOUND` is reserved for the case where an identifier cannot be matched at all (e.g. an unknown EID or ICCID), as distinct from a mismatch between two otherwise valid identifiers.
 
