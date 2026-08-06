@@ -369,7 +369,7 @@ paths:
       description: |
         Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in DISABLED state.
 
-        **Identification**: The ICCID identifies the target eSIM Profile to designate as fallback. The EID, when supplied, identifies the eUICC on which to set the fallback. When both are provided and the ICCID is not installed on the identified eUICC, the request is rejected with `422 IDENTIFIER_MISMATCH`.
+        **Identification**: The ICCID identifies the target eSIM Profile to designate as fallback. The EID, when supplied, identifies the eUICC on which to set the fallback. When both are provided and the ICCID is not installed on the identified eUICC, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`.
 
         **State Transition**: No state change (sets attribute only)
         **Required**: ICCID (target eSIM Profile). **Optional**: EID (target eUICC).
@@ -800,7 +800,7 @@ components:
                   code:
                     enum:
                       - SERVICE_NOT_APPLICABLE
-                      - IDENTIFIER_MISMATCH
+                      - ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
               description: Service not applicable for the provided identifier
@@ -812,5 +812,5 @@ components:
               description: The provided EID and ICCID are each individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID
               value:
                 status: 422
-                code: IDENTIFIER_MISMATCH
+                code: ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
                 message: The provided ICCID is not associated with the provided EID.
