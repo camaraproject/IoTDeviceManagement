@@ -40,12 +40,12 @@ The status and results of an asynchronous operation are retrieved by polling the
 
 ## Pre-requisites
 
-Before using the eSIM Profile Management API, agreements must be in place between the API Consumer and API Provider covering:
+Before using the eSIM Profile Management API, the API Consumer must establish a relationship with an API Provider. In particular:
 
-- Service plans and connectivity options
-- Geographic coverage areas
-- Device compatibility requirements
-- Terms and conditions including pricing
+- The API Consumer is responsible for choosing and contacting an API Provider that fulfils their requirements.
+- Agreements must be in place between the API Consumer and API Provider covering service plans and connectivity options, geographic coverage areas, device compatibility requirements, and terms and conditions including pricing.
+- The `activationCode` used in the `/download` operation is obtained from the API Provider and is therefore API Provider specific.
+- The API Provider is responsible for telling the API Consumer the FQDN of their `esim-profile-management` API.
 
 This preparation phase is **outside the scope** of the eSIM Profile Management API.
 
