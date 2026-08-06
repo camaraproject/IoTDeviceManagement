@@ -77,7 +77,9 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 ## States of operations
 
-Asynchronous operations have two status values: `ACCEPTED` and `COMPLETED`. The `status` reflects the operation lifecycle only; when an operation reaches `COMPLETED`, the `result.outcome` field carries the final outcome (`SUCCESS` or `FAILED`).
+An asynchronous request has one of two outcomes. It is either rejected synchronously with a 4xx (400, 401, 403, 404, 409, or 422), in which case no `operationId` is issued, or it is accepted with a `202`, an `operationId`, and `status: ACCEPTED`. A `422 SERVICE_NOT_APPLICABLE` is one of several possible synchronous rejections, not the only one.
+
+Once accepted, the operation has two status values: `ACCEPTED` and `COMPLETED`. The `status` reflects the operation lifecycle only, and `COMPLETED` is terminal. The final result is carried in `result.outcome` (`SUCCESS` or `FAILED`). A failure is described by a human-readable `result.failureReason`. Today a `FAILED` outcome is typically a device-side failure, such as the device being unreachable, an OTA timeout, or an SM-DP+ error. Which failures are detected before acceptance (a 4xx) versus after acceptance (on the operation) may evolve in future versions, as may the addition of a machine-readable failure code.
 
 **Figure**: lifecycle of an operation
 
@@ -85,6 +87,8 @@ Asynchronous operations have two status values: `ACCEPTED` and `COMPLETED`. The 
 
 - `ACCEPTED`: Operation queued for processing
 - `COMPLETED`: Operation finished (check `result.outcome` for `SUCCESS` or `FAILED`)
+
+The API Consumer must poll `GET /operations/{operationId}` to observe the transition to `COMPLETED`. There is no push or callback notification in this version; callbacks and event notifications may be added in a future version. A `COMPLETED` operation remains retrievable only for a provider-defined period; once purged, the endpoint returns `404`, so consumers must not rely on long-term availability.
 
 
 
@@ -111,7 +115,9 @@ When both an EID and an ICCID are provided and each is individually valid, but t
 The status and result of an asynchronous operation are retrieved by polling:
 - GET /esim-profile-management/operations/{operationId}
 
-Event-based notifications (e.g. CloudEvents callbacks to a sink URL) are not supported in this version.
+The consumer polls until `status` is `COMPLETED`, then reads `result.outcome`. The operation resource may later return `404` once it has been purged (see States of operations).
+
+Event-based notifications (e.g. CloudEvents callbacks to a sink URL) are not supported in this version and may be added in a future version.
 
 ## Security and Authorization
 

@@ -56,15 +56,13 @@ info:
 
     This preparation phase is **outside the scope** of the eSIM Management API.
 
-    # Error Handling
+    # Operation states
 
-    All operations that require device interaction (download, enable, disable, delete, set-fallback) are asynchronous and return 202 with an operationId on acceptance. Errors are reported as follows:
+    Operations that act on the device (download, enable, disable, delete, set-fallback) are asynchronous. A request is either rejected synchronously with a 4xx (no `operationId` issued), or accepted with `202`, an `operationId`, and `status: ACCEPTED`.
 
-    - **Synchronous errors (immediate 4xx)**: Failures detectable without device interaction are returned immediately. This includes authentication failures (401), authorization failures (403), unknown identifiers (404), state-precondition violations (409), malformed requests (400), and inapplicable service (422).
+    Once accepted, `status` moves from `ACCEPTED` to `COMPLETED`, which is terminal. The final result is carried in `result.outcome` (`SUCCESS` or `FAILED`), and a failure is described by `result.failureReason`. Which failures are detected before acceptance versus reported on the operation may evolve in future versions.
 
-    - **Asynchronous failures (202 → status: COMPLETED, result.outcome: FAILED)**: Failures that occur during device-side execution (e.g. device unreachable, OTA timeout, SM-DP+ error) are reported via the operation resource. Poll GET /operations/{operationId} to retrieve the outcome.
-
-    Operation status is retrieved by polling GET /operations/{operationId}. Event-based notifications are not supported in this version.
+    The API Consumer must poll GET /operations/{operationId} to observe completion. A `COMPLETED` operation is retrievable only for a provider-defined period, after which the endpoint returns `404`. Callbacks and event notifications are planned in future versions.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
     # Authorization and authentication
@@ -504,7 +502,9 @@ paths:
         - eSIM Profile Operations
       summary: Retrieve operation information
       description: |
-        Retrieves detailed information about an eSIM Profile operation including status, results, and progress.
+        Retrieves detailed information about an eSIM Profile operation including its `status` and, once `COMPLETED`, its `result`.
+
+        The API Consumer polls this endpoint to observe the transition from `ACCEPTED` to `COMPLETED`. A `COMPLETED` operation remains retrievable only for a provider-defined period, after which this endpoint returns `404`.
 
         **Operation ID**: From any eSIM Profile operation response
       operationId: retrieveOperation
