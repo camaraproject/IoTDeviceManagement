@@ -36,7 +36,7 @@ The status and results of an asynchronous operation are retrieved by polling the
 
 **Figure**: High-level sequence of steps
 
-![High-level sequence of steps](./diagrams/high-level-steps.png)
+<img src="./diagrams/high-level-steps.png" alt="High-level sequence of steps" width="180" />
 
 ## Pre-requisites
 
@@ -55,7 +55,7 @@ eSIM Profile Management APIs currently do not support procurement of eSIM Profil
 
 ## High-level flow
 
-![High-level flow](./diagrams/high-level-flow.png)
+<img src="./diagrams/high-level-flow.png" alt="High-level flow" width="750" />
 
 Main steps:
 
@@ -70,7 +70,7 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 **Figure**: lifecycle of an eSIM Profile
 
-![Lifecycle of an eSIM Profile](./diagrams/esim-profile-lifecycle.png)
+<img src="./diagrams/esim-profile-lifecycle.png" alt="Lifecycle of an eSIM Profile" width="450" />
 
 - DISABLED: eSIM Profile installed but not active
 - ENABLED: eSIM Profile active and providing connectivity
@@ -83,7 +83,7 @@ Asynchronous operations have two status values: `ACCEPTED` and `COMPLETED`. The 
 
 **Figure**: lifecycle of an operation
 
-![Lifecycle of an operation](./diagrams/operation-lifecycle.png)
+<img src="./diagrams/operation-lifecycle.png" alt="Lifecycle of an operation" width="275" />
 
 - `ACCEPTED`: Operation queued for processing
 - `COMPLETED`: Operation finished (check `result.outcome` for `SUCCESS` or `FAILED`)
