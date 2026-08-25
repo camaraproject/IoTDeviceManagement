@@ -36,24 +36,26 @@ The status and results of an asynchronous operation are retrieved by polling the
 
 **Figure**: High-level sequence of steps
 
-![High-level sequence of steps](./diagrams/high-level-steps.png)
+<img src="./diagrams/high-level-steps.png" alt="High-level sequence of steps" width="180" />
 
 ## Pre-requisites
 
-Before using the eSIM Profile Management API, agreements must be in place between the API Consumer and API Provider covering:
+Before using the eSIM Profile Management API, the API Consumer must establish a relationship with an API Provider. In particular:
 
-- Service plans and connectivity options
-- Geographic coverage areas
-- Device compatibility requirements
-- Terms and conditions including pricing
+- The API Consumer is responsible for choosing and contacting an API Provider that fulfils their requirements.
+- Agreements must be in place between the API Consumer and API Provider covering service plans and connectivity options, geographic coverage areas, device compatibility requirements, and terms and conditions including pricing.
+- The `activationCode` used in the `/download` operation is obtained from the API Provider and is therefore API Provider specific.
+- The API Provider is responsible for telling the API Consumer the FQDN of their `esim-profile-management` API.
 
 This preparation phase is **outside the scope** of the eSIM Profile Management API.
+
+**Device connectivity**: All operations act on the device over-the-air (download, enable, disable, delete, set-fallback). The target device must therefore be reachable over cellular or Wi-Fi when an operation runs. Download is the notable case. Because it may deliver the device's first eSIM Profile, that initial connectivity has to come from another bearer, such as an existing profile, a bootstrap profile, or Wi-Fi. The API does not provide this connectivity itself. A device that cannot be reached at all cannot be operated on through it. If the device becomes unreachable mid-operation, the operation completes with a `FAILED` outcome rather than being rejected synchronously.
 
 eSIM Profile Management APIs currently do not support procurement of eSIM Profiles and such a capability may be added in future revisions.
 
 ## High-level flow
 
-![High-level flow](./diagrams/high-level-flow.png)
+<img src="./diagrams/high-level-flow.png" alt="High-level flow" width="750" />
 
 Main steps:
 
@@ -68,7 +70,7 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 **Figure**: lifecycle of an eSIM Profile
 
-![Lifecycle of an eSIM Profile](./diagrams/esim-profile-lifecycle.png)
+<img src="./diagrams/esim-profile-lifecycle.png" alt="Lifecycle of an eSIM Profile" width="450" />
 
 - DISABLED: eSIM Profile installed but not active
 - ENABLED: eSIM Profile active and providing connectivity
@@ -83,7 +85,7 @@ Once accepted, the operation has two status values: `ACCEPTED` and `COMPLETED`. 
 
 **Figure**: lifecycle of an operation
 
-![Lifecycle of an operation](./diagrams/operation-lifecycle.png)
+<img src="./diagrams/operation-lifecycle.png" alt="Lifecycle of an operation" width="275" />
 
 - `ACCEPTED`: Operation queued for processing
 - `COMPLETED`: Operation finished (check `result.outcome` for `SUCCESS` or `FAILED`)

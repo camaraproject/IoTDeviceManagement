@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: eSIM Profile Management API
   description: |
-    CAMARA eSIM Profile Management API v0.1 - Developer-friendly eSIM Profile APIs
+    Developer-friendly eSIM Profile Management API
 
     # Introduction
 
@@ -49,14 +49,16 @@ info:
 
     # Pre-requisites
 
-    Before using the eSIM Management API, agreements must be in place between the API Consumer and API Provider covering:
+    Before using the eSIM Profile Management API, the API Consumer must establish a relationship with an API Provider. In particular:
 
-    - Service plans and connectivity options
-    - Geographic coverage areas
-    - Device compatibility requirements
-    - Terms and conditions including pricing
+    - The API Consumer is responsible for choosing and contacting an API Provider that fulfils their requirements.
+    - Agreements must be in place between the API Consumer and API Provider covering service plans and connectivity options, geographic coverage areas, device compatibility requirements, and terms and conditions including pricing.
+    - The `activationCode` used in the `/download` operation is obtained from the API Provider and is therefore API Provider specific.
+    - The API Provider is responsible for telling the API Consumer the FQDN of their `esim-profile-management` API.
 
-    This preparation phase is **outside the scope** of the eSIM Management API.
+    This preparation phase is **outside the scope** of the eSIM Profile Management API.
+
+    All operations act on the device over-the-air (download, enable, disable, delete, set-fallback). The target device must therefore be reachable, with working IP connectivity, when an operation runs. Download is the notable case. It may deliver the device's first eSIM Profile, so that initial connectivity has to come from another bearer, such as an existing profile, a bootstrap profile, or Wi-Fi. This API does not provide that connectivity. If the device is not reachable while an operation runs, the operation completes with a `FAILED` outcome rather than being rejected up front.
 
     # Operation states
 
@@ -67,6 +69,7 @@ info:
     The API Consumer must poll GET /operations/{operationId} to observe completion. A `COMPLETED` operation is retrievable only for a provider-defined period, after which the endpoint returns `404`. Callbacks and event notifications are planned in future versions.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
+
     # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
@@ -77,6 +80,7 @@ info:
     <!-- CAMARA:MANDATORY:authorization-and-authentication:END -->
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
+
     # Additional CAMARA error responses
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
@@ -87,6 +91,7 @@ info:
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
 
     <!-- CAMARA:MANDATORY:request-body-strictness:BEGIN -->
+
     # Request body strictness
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
