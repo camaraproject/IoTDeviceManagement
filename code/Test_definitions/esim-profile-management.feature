@@ -1,4 +1,4 @@
-Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
+Feature: CAMARA eSIM Profile Management API, v0.1.0-rc.1 - Happy Path
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -23,7 +23,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
 
   @esim_profile_download_01_success
   Scenario: Download eSIM Profile to device
-    Given the resource "/esim-profile-management/vwip/download"
+    Given the resource "/esim-profile-management/v0.1rc1/download"
     And the request body is set to a request body compliant with the schema at "/components/schemas/DownloadEsimProfileRequest"
     And the request body property "$.esimProfile.eid" is set to a valid EID
     And the request body property "$.activationCode" is set to a valid activation code
@@ -41,7 +41,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
 
   @esim_profile_iccidOperation_01_success
   Scenario Outline: Successful <operation> of eSIM Profile
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc1/<endpoint>"
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID
     When the request "<operationId>" is sent
     Then the response status code is 202
@@ -64,7 +64,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
 
   @esim_profile_retrieveStatus_01_success
   Scenario Outline: Retrieve eSIM Profile status by <identifier_type>
-    Given the resource "/esim-profile-management/vwip/retrieve-status"
+    Given the resource "/esim-profile-management/v0.1rc1/retrieve-status"
     And the request body property "$.esimProfile.<identifier_field>" is set to a valid <identifier_type>
     When the request "getEsimProfileStatus" is sent
     Then the response status code is 200
@@ -83,7 +83,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
   @esim_profile_retrieveOperation_01_success
   Scenario: Retrieve operation information
     Given an existing operation from a previous eSIM Profile request
-    And the resource "/esim-profile-management/vwip/operations/{operationId}"
+    And the resource "/esim-profile-management/v0.1rc1/operations/{operationId}"
     And the path parameter "operationId" is set to an existing operation ID
     When the request "retrieveOperation" is sent
     Then the response status code is 200
