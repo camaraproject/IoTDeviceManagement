@@ -24,9 +24,11 @@ info:
     ## Operation-Specific Identification
 
     - **Download**: Requires EID (target device) and activationCode. ICCID is assigned during download and returned in response.
-    - **Enable/Disable/Delete**: Requires only ICCID
-    - **Set-Fallback**: Requires only ICCID
-    - **Status**: Accepts either EID (all profiles on device) or ICCID (specific profile)
+    - **Enable/Disable/Delete**: Requires ICCID; EID may optionally be supplied to identify the target eUICC directly.
+    - **Set-Fallback**: Requires ICCID; EID may optionally be supplied to identify the target eUICC directly.
+    - **Status**: Accepts EID (all profiles on device), ICCID (specific profile), or both (specific profile, pairing asserted)
+
+    The ICCID identifies the target eSIM Profile; supplying the EID as well is always optional. It serves two purposes: as a routing hint, letting the provider act on the target device directly without first resolving which device holds the ICCID (a step IoT deployments often avoid to conserve device data and energy); and as a defensive assertion of the pairing. If the ICCID is not installed on the identified EID, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`. See the API documentation for details.
 
     # Operation Lifecycle
 
@@ -369,7 +371,7 @@ paths:
       description: |
         Configures an eSIM Profile as fallback (backup) profile for automatic enabling if primary profiles fail. The eSIM Profile must be in DISABLED state.
 
-        **Identification**: The ICCID identifies the target eSIM Profile to designate as fallback. The EID, when supplied, identifies the eUICC on which to set the fallback. When both are provided and the ICCID is not installed on the identified eUICC, the request is rejected with `422 IDENTIFIER_MISMATCH`.
+        **Identification**: The ICCID identifies the target eSIM Profile to designate as fallback. The EID, when supplied, identifies the eUICC on which to set the fallback. When both are provided and the ICCID is not installed on the identified eUICC, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`.
 
         **State Transition**: No state change (sets attribute only)
         **Required**: ICCID (target eSIM Profile). **Optional**: EID (target eUICC).
@@ -441,7 +443,7 @@ paths:
 
         This operation uses POST despite being a read operation. Device identifiers (EID/ICCID) are passed in the request body rather than as URL parameters to prevent their exposure in server logs, proxy caches, and browser history.
 
-        **eSIM Profile Identification**: Accepts either EID (all profiles on device) or ICCID (specific profile)
+        **eSIM Profile Identification**: Accepts EID (all profiles on device), ICCID (specific profile), or both (specific profile, with the EID/ICCID pairing asserted)
       operationId: getEsimProfileStatus
       security:
         - openId:
@@ -606,10 +608,14 @@ components:
           $ref: '#/components/schemas/ESimProfileIccid'
 
     ESimProfileForDownload:
-      allOf:
-        - $ref: '#/components/schemas/ESimProfile'
-        - required: [eid]
-      description: eSIM Profile identification for download operations (requires only EID, ICCID will be assigned during download)
+      type: object
+      properties:
+        eid:
+          $ref: '#/components/schemas/ESimProfileEid'
+      required:
+        - eid
+      additionalProperties: false
+      description: eSIM Profile identification for download operations. Only the EID is accepted; the ICCID is assigned during download and returned in the response.
 
     ESimProfileForOperation:
       allOf:
@@ -623,7 +629,7 @@ components:
         - anyOf:
             - required: [eid]
             - required: [iccid]
-      description: eSIM Profile identification for status operations (requires either EID or ICCID)
+      description: eSIM Profile identification for status operations (requires EID, ICCID, or both)
     # Request schemas using new eSIM Profile identification
     DownloadEsimProfileRequest:
       type: object
@@ -800,7 +806,7 @@ components:
                   code:
                     enum:
                       - SERVICE_NOT_APPLICABLE
-                      - IDENTIFIER_MISMATCH
+                      - ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
               description: Service not applicable for the provided identifier
@@ -812,5 +818,5 @@ components:
               description: The provided EID and ICCID are each individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID
               value:
                 status: 422
-                code: IDENTIFIER_MISMATCH
+                code: ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
                 message: The provided ICCID is not associated with the provided EID.
