@@ -103,6 +103,10 @@ info:
   version: wip
   x-camara-commonalities: 0.8.0
 
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/IoTDeviceManagement
+
 servers:
   - url: "{apiRoot}/esim-profile-management/vwip"
     variables:
