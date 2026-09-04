@@ -103,6 +103,10 @@ info:
   version: wip
   x-camara-commonalities: 0.8.0
 
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/IoTDeviceManagement
+
 servers:
   - url: "{apiRoot}/esim-profile-management/vwip"
     variables:
@@ -175,8 +179,8 @@ paths:
           $ref: '#/components/responses/Generic403'
         '404':
           $ref: '#/components/responses/Generic404'
-        '422':
-          $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /enable:
     post:
@@ -241,6 +245,8 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /disable:
     post:
@@ -303,6 +309,8 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /delete:
     post:
@@ -365,6 +373,8 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /set-fallback:
     post:
@@ -435,6 +445,8 @@ paths:
           $ref: '#/components/responses/Generic409'
         '422':
           $ref: '#/components/responses/Generic422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /retrieve-status:
     post:
@@ -501,7 +513,9 @@ paths:
         '404':
           $ref: '#/components/responses/Generic404'
         '422':
-          $ref: '#/components/responses/Generic422'
+          $ref: '#/components/responses/IdentifierMismatch422'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
   /operations/{operationId}:
     get:
@@ -558,7 +572,9 @@ paths:
         '403':
           $ref: '#/components/responses/Generic403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '#/components/responses/OperationNotFound404'
+        '429':
+          $ref: '#/components/responses/Generic429'
 
 components:
   securitySchemes:
@@ -784,15 +800,139 @@ components:
 
   responses:
     Generic400:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic400'
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              description: Invalid Argument. Generic Syntax Exception
+              value:
+                status: 400
+                code: INVALID_ARGUMENT
+                message: Client specified an invalid argument, request body or query param.
     Generic401:
       $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
     Generic403:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic403'
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+              value:
+                status: 403
+                code: PERMISSION_DENIED
+                message: Client does not have sufficient permissions to perform this action.
     Generic404:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic404'
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - IDENTIFIER_NOT_FOUND
+          examples:
+            GENERIC_404_IDENTIFIER_NOT_FOUND:
+              description: The provided EID or ICCID cannot be matched to a device or eSIM Profile
+              value:
+                status: 404
+                code: IDENTIFIER_NOT_FOUND
+                message: Device identifier not found.
+    OperationNotFound404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              description: The operation is not found, either because the operationId is unknown or because a completed operation has been purged after its retention period
+              value:
+                status: 404
+                code: NOT_FOUND
+                message: The specified resource is not found.
     Generic409:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic409'
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - INCOMPATIBLE_STATE
+                      - ABORTED
+          examples:
+            GENERIC_409_INCOMPATIBLE_STATE:
+              description: The eSIM Profile is not in a state compatible with the requested operation
+              value:
+                status: 409
+                code: INCOMPATIBLE_STATE
+                message: The eSIM Profile is not in a state compatible with the requested operation.
+            GENERIC_409_ABORTED:
+              description: Another operation is already in progress on the same eSIM Profile or device
+              value:
+                status: 409
+                code: ABORTED
+                message: Resource is being modified by another operation. Please wait, and retry if appropriate.
     Generic422:
       description: Unprocessable Content
       headers:
@@ -814,7 +954,7 @@ components:
                       - ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
-              description: Service not applicable for the provided identifier
+              description: The operation cannot be applied to the referenced eSIM Profile or device (e.g. the profile is not eligible to serve as a fallback, or is not provisioned with a connectivity service that can be enabled)
               value:
                 status: 422
                 code: SERVICE_NOT_APPLICABLE
@@ -825,3 +965,60 @@ components:
                 status: 422
                 code: ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
                 message: The provided ICCID is not associated with the provided EID.
+    IdentifierMismatch422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
+          examples:
+            ESIM_PROFILE_MANAGEMENT_422_IDENTIFIER_MISMATCH:
+              description: The provided EID and ICCID are each individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID
+              value:
+                status: 422
+                code: ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
+                message: The provided ICCID is not associated with the provided EID.
+    Generic429:
+      description: Too Many Requests
+      headers:
+        x-correlator:
+          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 429
+                  code:
+                    enum:
+                      - QUOTA_EXCEEDED
+                      - TOO_MANY_REQUESTS
+          examples:
+            GENERIC_429_QUOTA_EXCEEDED:
+              description: Request is rejected due to exceeding a business quota limit
+              value:
+                status: 429
+                code: QUOTA_EXCEEDED
+                message: Out of resource quota.
+            GENERIC_429_TOO_MANY_REQUESTS:
+              description: Access to the API has been temporarily blocked due to rate or spike arrest limits being reached
+              value:
+                status: 429
+                code: TOO_MANY_REQUESTS
+                message: Rate limit reached.
