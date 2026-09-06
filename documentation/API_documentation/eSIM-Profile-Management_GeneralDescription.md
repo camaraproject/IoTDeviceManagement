@@ -79,7 +79,9 @@ eSIM Profiles have two states: DISABLED and ENABLED.
 
 ## States of operations
 
-An asynchronous request has one of two outcomes. It is either rejected synchronously with a 4xx (400, 401, 403, 404, 409, or 422), in which case no `operationId` is issued, or it is accepted with a `202`, an `operationId`, and `status: ACCEPTED`. A `422 SERVICE_NOT_APPLICABLE` is one of several possible synchronous rejections, not the only one.
+An asynchronous request has one of two outcomes.
+It is either rejected synchronously with a `4xx`, in which case no `operationId` is issued, or it is accepted with a `202`, an `operationId`, and `status: ACCEPTED`.
+See the [Error Handling Guide](./eSIM-Profile-Management-ErrorHandling.md) for the error codes and the condition that triggers each.
 
 Once accepted, the operation has two status values: `ACCEPTED` and `COMPLETED`. The `status` reflects the operation lifecycle only, and `COMPLETED` is terminal. The final result is carried in `result.outcome` (`SUCCESS` or `FAILED`). A failure is described by a human-readable `result.failureReason`. Today a `FAILED` outcome is typically a device-side failure, such as the device being unreachable, an OTA timeout, or an SM-DP+ error. Which failures are detected before acceptance (a 4xx) versus after acceptance (on the operation) may evolve in future versions, as may the addition of a machine-readable failure code.
 
@@ -119,7 +121,7 @@ Supplying both the EID and the ICCID together is always optional; providing only
 
 For status retrieval specifically: supplying only the EID returns all profiles on the device, supplying only the ICCID returns that single profile, and supplying both returns that profile subject to the same pairing assertion.
 
-When both an EID and an ICCID are provided and each is individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`. Note that `404 IDENTIFIER_NOT_FOUND` is reserved for the case where an identifier cannot be matched at all (e.g. an unknown EID or ICCID), as distinct from a mismatch between two otherwise valid identifiers.
+When both an EID and an ICCID are provided and each is individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID, the request is rejected with `422 ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH`.
 
 ## Operation Status Retrieval
 
