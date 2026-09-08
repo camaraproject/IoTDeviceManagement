@@ -1,4 +1,4 @@
-Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
+Feature: CAMARA eSIM Profile Management API, v0.1.0-rc.2 - Error and semantic scenarios
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -32,7 +32,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_400_01_identifier_not_schema_compliant
   Scenario Outline: <operationId> is rejected when an identifier does not comply with the schema
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the request body property "<property>" does not comply with the OAS schema at "<schema>"
     When the request "<operationId>" is sent
     Then the response status code is 400
@@ -52,7 +52,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_400_02_required_property_missing
   Scenario Outline: <operationId> is rejected when a required property is missing
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the request body property "<property>" is not included
     When the request "<operationId>" is sent
     Then the response status code is 400
@@ -73,7 +73,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
   # at any nesting level, on any endpoint
   @esim_profile_errors_400_03_unknown_property
   Scenario: A request body with an undeclared property is rejected
-    Given the resource "/esim-profile-management/vwip/enable"
+    Given the resource "/esim-profile-management/v0.1rc2/enable"
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID
     And the request body property "$.esimProfile.unknownProperty" is set to "x"
     When the request "enableEsimProfile" is sent
@@ -84,7 +84,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_400_04_retrieve_status_no_identifier
   Scenario: Retrieve status is rejected when neither EID nor ICCID is provided
-    Given the resource "/esim-profile-management/vwip/retrieve-status"
+    Given the resource "/esim-profile-management/v0.1rc2/retrieve-status"
     And the request body property "$.esimProfile" is set to: {}
     When the request "getEsimProfileStatus" is sent
     Then the response status code is 400
@@ -98,7 +98,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_401_01_no_valid_token
   Scenario Outline: <operationId> is rejected without a valid access token
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the header "Authorization" is set to an invalid access token
     When the request "<operationId>" is sent
     Then the response status code is 401
@@ -117,7 +117,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_403_01_missing_scope
   Scenario Outline: <operationId> is rejected when the access token lacks the required scope
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the header "Authorization" is set to a valid access token that lacks the "<scope>" scope
     When the request "<operationId>" is sent
     Then the response status code is 403
@@ -140,7 +140,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_404_01_identifier_not_found
   Scenario Outline: <operationId> is rejected when the identifier does not match any device/profile
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the request body property "<property>" is compliant with the schema but does not identify a valid <target>
     When the request "<operationId>" is sent
     Then the response status code is 404
@@ -159,7 +159,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_404_02_operation_not_found
   Scenario: Retrieve operation is rejected when the operationId is unknown or expired
-    Given the resource "/esim-profile-management/vwip/operations/{operationId}"
+    Given the resource "/esim-profile-management/v0.1rc2/operations/{operationId}"
     And the path parameter "operationId" is compliant with the schema but does not identify a known operation
     When the request "retrieveOperation" is sent
     Then the response status code is 404
@@ -173,7 +173,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_409_01_enabled_profile
   Scenario Outline: <operationId> is rejected when the target eSIM Profile is ENABLED
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID for an eSIM Profile in ENABLED state
     When the request "<operationId>" is sent
     Then the response status code is 409
@@ -193,7 +193,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_422_01_identifier_mismatch_operation
   Scenario Outline: <operationId> is rejected when the ICCID is not installed on the given EID
-    Given the resource "/esim-profile-management/vwip/<endpoint>"
+    Given the resource "/esim-profile-management/v0.1rc2/<endpoint>"
     And the request body property "$.esimProfile.eid" is set to a valid EID
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID that is not installed on that eUICC
     When the request "<operationId>" is sent
@@ -212,7 +212,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_422_02_identifier_mismatch_retrieve_status
   Scenario: Retrieve status is rejected when the ICCID is not installed on the given EID
-    Given the resource "/esim-profile-management/vwip/retrieve-status"
+    Given the resource "/esim-profile-management/v0.1rc2/retrieve-status"
     And the request body property "$.esimProfile.eid" is set to a valid EID
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID that is not installed on that eUICC
     When the request "getEsimProfileStatus" is sent
@@ -224,7 +224,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
 
   @esim_profile_errors_422_03_service_not_applicable
   Scenario: Set-fallback is rejected when the eSIM Profile cannot serve as a fallback
-    Given the resource "/esim-profile-management/vwip/set-fallback"
+    Given the resource "/esim-profile-management/v0.1rc2/set-fallback"
     And the request body property "$.esimProfile.iccid" is set to a valid ICCID for an eSIM Profile that is not eligible to serve as a fallback
     When the request "setFallbackEsimProfile" is sent
     Then the response status code is 422
@@ -240,7 +240,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
   @esim_profile_errors_200_01_operation_failed_outcome
   Scenario: Retrieve an operation that completed with a FAILED outcome
     Given an existing operation whose target device was unreachable and which has completed
-    And the resource "/esim-profile-management/vwip/operations/{operationId}"
+    And the resource "/esim-profile-management/v0.1rc2/operations/{operationId}"
     And the path parameter "operationId" is set to that operation ID
     When the request "retrieveOperation" is sent
     Then the response status code is 200
