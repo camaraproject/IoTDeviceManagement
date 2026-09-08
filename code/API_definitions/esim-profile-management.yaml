@@ -85,7 +85,7 @@ info:
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
 
-    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified from the `x-camara-commonalities` field, the changelog and the metadata of the released API version.
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
@@ -101,7 +101,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.8.0
+  x-camara-commonalities: 0.9.0
 
 externalDocs:
   description: Product documentation at CAMARA
@@ -172,15 +172,15 @@ paths:
                     esimProfile:
                       eid: "89049032000000000000000000000001"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /enable:
     post:
@@ -234,19 +234,19 @@ paths:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '409':
-          $ref: '#/components/responses/Generic409'
+          $ref: '#/components/responses/Conflict409'
         '422':
-          $ref: '#/components/responses/Generic422'
+          $ref: '#/components/responses/UnprocessableContent422'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /disable:
     post:
@@ -298,19 +298,19 @@ paths:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '409':
-          $ref: '#/components/responses/Generic409'
+          $ref: '#/components/responses/Conflict409'
         '422':
-          $ref: '#/components/responses/Generic422'
+          $ref: '#/components/responses/UnprocessableContent422'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /delete:
     post:
@@ -362,19 +362,19 @@ paths:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789012"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '409':
-          $ref: '#/components/responses/Generic409'
+          $ref: '#/components/responses/Conflict409'
         '422':
-          $ref: '#/components/responses/Generic422'
+          $ref: '#/components/responses/UnprocessableContent422'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /set-fallback:
     post:
@@ -434,19 +434,19 @@ paths:
                       eid: "89049032000000000000000000000001"
                       iccid: "8901260123456789013"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '409':
-          $ref: '#/components/responses/Generic409'
+          $ref: '#/components/responses/Conflict409'
         '422':
-          $ref: '#/components/responses/Generic422'
+          $ref: '#/components/responses/UnprocessableContent422'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /retrieve-status:
     post:
@@ -505,17 +505,17 @@ paths:
                         state: "DISABLED"
                         isFallback: true
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/Generic404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/IdentifierNotFound404'
         '422':
           $ref: '#/components/responses/IdentifierMismatch422'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
   /operations/{operationId}:
     get:
@@ -566,15 +566,15 @@ paths:
                       outcome: "SUCCESS"
                       assignedIccid: "8901260123456789012"
         '400':
-          $ref: '#/components/responses/Generic400'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/BadRequest400'
         '401':
-          $ref: '#/components/responses/Generic401'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/Unauthenticated401'
         '403':
-          $ref: '#/components/responses/Generic403'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/PermissionDenied403'
         '404':
-          $ref: '#/components/responses/OperationNotFound404'
+          $ref: '../common/CAMARA_common.yaml#/components/responses/NotFound404'
         '429':
-          $ref: '#/components/responses/Generic429'
+          $ref: '#/components/responses/TooManyRequests429'
 
 components:
   securitySchemes:
@@ -799,109 +799,12 @@ components:
         - esimProfiles
 
   responses:
-    Generic400:
-      description: Bad Request
-      headers:
-        x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 400
-                  code:
-                    enum:
-                      - INVALID_ARGUMENT
-          examples:
-            GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-    Generic401:
-      $ref: '../common/CAMARA_common.yaml#/components/responses/Generic401'
-    Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-    Generic404:
-      description: Not found
-      headers:
-        x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 404
-                  code:
-                    enum:
-                      - IDENTIFIER_NOT_FOUND
-          examples:
-            GENERIC_404_IDENTIFIER_NOT_FOUND:
-              description: The provided EID or ICCID cannot be matched to a device or eSIM Profile
-              value:
-                status: 404
-                code: IDENTIFIER_NOT_FOUND
-                message: Device identifier not found.
-    OperationNotFound404:
-      description: Not found
-      headers:
-        x-correlator:
-          $ref: '../common/CAMARA_common.yaml#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: '../common/CAMARA_common.yaml#/components/schemas/ErrorInfo'
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 404
-                  code:
-                    enum:
-                      - NOT_FOUND
-          examples:
-            GENERIC_404_NOT_FOUND:
-              description: The operation is not found, either because the operationId is unknown or because a completed operation has been purged after its retention period
-              value:
-                status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-    Generic409:
+    # Locally defined error responses for API-specific codes and code
+    # combinations not covered by the CAMARA_common.yaml catalogue. Standard
+    # codes reference the shared examples in CAMARA_common.yaml so the wording
+    # stays consistent across CAMARA APIs; the ESIM_PROFILE_MANAGEMENT.* code
+    # keeps its API-specific example inline.
+    Conflict409:
       description: Conflict
       headers:
         x-correlator:
@@ -922,18 +825,10 @@ components:
                       - ABORTED
           examples:
             GENERIC_409_INCOMPATIBLE_STATE:
-              description: The eSIM Profile is not in a state compatible with the requested operation
-              value:
-                status: 409
-                code: INCOMPATIBLE_STATE
-                message: The eSIM Profile is not in a state compatible with the requested operation.
+              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_409_INCOMPATIBLE_STATE'
             GENERIC_409_ABORTED:
-              description: Another operation is already in progress on the same eSIM Profile or device
-              value:
-                status: 409
-                code: ABORTED
-                message: Resource is being modified by another operation. Please wait, and retry if appropriate.
-    Generic422:
+              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED'
+    UnprocessableContent422:
       description: Unprocessable Content
       headers:
         x-correlator:
@@ -954,11 +849,7 @@ components:
                       - ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
-              description: The operation cannot be applied to the referenced eSIM Profile or device (e.g. the profile is not eligible to serve as a fallback, or is not provisioned with a connectivity service that can be enabled)
-              value:
-                status: 422
-                code: SERVICE_NOT_APPLICABLE
-                message: The service is not available for the provided identifier.
+              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE'
             ESIM_PROFILE_MANAGEMENT_422_IDENTIFIER_MISMATCH:
               description: The provided EID and ICCID are each individually valid, but the ICCID does not correspond to an eSIM Profile installed on the eUICC identified by the EID
               value:
@@ -990,7 +881,7 @@ components:
                 status: 422
                 code: ESIM_PROFILE_MANAGEMENT.IDENTIFIER_MISMATCH
                 message: The provided ICCID is not associated with the provided EID.
-    Generic429:
+    TooManyRequests429:
       description: Too Many Requests
       headers:
         x-correlator:
@@ -1011,14 +902,6 @@ components:
                       - TOO_MANY_REQUESTS
           examples:
             GENERIC_429_QUOTA_EXCEEDED:
-              description: Request is rejected due to exceeding a business quota limit
-              value:
-                status: 429
-                code: QUOTA_EXCEEDED
-                message: Out of resource quota.
+              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_429_QUOTA_EXCEEDED'
             GENERIC_429_TOO_MANY_REQUESTS:
-              description: Access to the API has been temporarily blocked due to rate or spike arrest limits being reached
-              value:
-                status: 429
-                code: TOO_MANY_REQUESTS
-                message: Rate limit reached.
+              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_429_TOO_MANY_REQUESTS'
