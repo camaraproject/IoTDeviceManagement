@@ -2,6 +2,7 @@
 
 <!-- TOC:START -->
 ## Table of Contents
+- [r1.3](#r13)
 - [r1.2](#r12)
 - [r1.1](#r11)
 <!-- TOC:END -->
@@ -14,6 +15,50 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r1.3
+
+## Release Notes
+
+This release candidate contains the definition and documentation of
+* esim-profile-management 0.1.0-rc.2
+
+The API definition(s) are based on
+* Commonalities r4.4 (0.9.0)
+* Identity and Consent Management r4.2 (0.5.0)
+
+## esim-profile-management 0.1.0-rc.2
+
+**esim-profile-management 0.1.0-rc.2 is a release-candidate version of this API.**
+
+Changes documented below are compared to version 0.1.0-rc.1.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/IoTDeviceManagement/r1.3/code/API_definitions/esim-profile-management.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/IoTDeviceManagement/r1.3/code/API_definitions/esim-profile-management.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/IoTDeviceManagement/blob/r1.3/code/API_definitions/esim-profile-management.yaml)
+
+### Breaking changes
+
+* N/A
+
+### Added
+
+* `429` (Too Many Requests) responses, plus dedicated `404` (operation not found) and `422` (EID/ICCID identifier mismatch) error responses on the relevant operations.
+
+### Changed
+
+* Aligned error responses to Commonalities r4.4 (0.9.0): now referencing the shared CAMARA error-response catalogue and examples, replacing the deprecated `Generic*` responses.
+
+### Fixed
+
+* N/A
+
+### Removed
+
+* N/A
+
+**Full Changelog**: https://github.com/camaraproject/IoTDeviceManagement/compare/r1.2...r1.3
 
 # r1.2
 
