@@ -25,14 +25,14 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
   @esim_profile_download_01_success
   Scenario: Download eSIM Profile to device
     Given the resource "/esim-profile-management/vwip/download"
-    And the request body is set to a request body compliant with the schema at "/components/schemas/DownloadEsimProfileRequest"
+    And the request body is set to a request body compliant with the schema at "#/components/schemas/DownloadEsimProfileRequest"
     And the request body property "$.esimProfile.eid" is set to a valid EID
     And the request body property "$.activationCode" is set to a valid activation code
     When the request "downloadEsimProfile" is sent
     Then the response status code is 202
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/ESimProfileResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/ESimProfileResponse"
     And the response property "$.operationId" exists
     And the response property "$.operation" is "download"
     And the response property "$.status" is "accepted"
@@ -48,7 +48,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
     Then the response status code is 202
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/ESimProfileResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/ESimProfileResponse"
     And the response property "$.operationId" exists
     And the response property "$.operation" is "<operation>"
     And the response property "$.status" is "accepted"
@@ -71,7 +71,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/EsimProfileStatusResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/EsimProfileStatusResponse"
     And the response property "$.esimProfiles" is an array with at least 1 item
 
     Examples:
@@ -90,7 +90,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Happy Path
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/ESimProfileResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/ESimProfileResponse"
     And the response property "$.operationId" is equal to the path parameter "operationId"
     And the response property "$.operation" exists
     And the response property "$.status" exists
