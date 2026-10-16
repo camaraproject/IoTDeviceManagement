@@ -802,8 +802,8 @@ components:
     # Locally defined error responses for API-specific codes and code
     # combinations not covered by the CAMARA_common.yaml catalogue. Standard
     # codes reference the shared examples in CAMARA_common.yaml so the wording
-    # stays consistent across CAMARA APIs; the ESIM_PROFILE_MANAGEMENT.* code
-    # keeps its API-specific example inline.
+    # stays consistent across CAMARA APIs; examples that must name this API's
+    # own codes or states are kept inline.
     Conflict409:
       description: Conflict
       headers:
@@ -825,7 +825,11 @@ components:
                       - ABORTED
           examples:
             GENERIC_409_INCOMPATIBLE_STATE:
-              $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_409_INCOMPATIBLE_STATE'
+              description: The target eSIM Profile is not in the state required by the operation
+              value:
+                status: 409
+                code: INCOMPATIBLE_STATE
+                message: eSIM Profile must be in DISABLED state for this operation. Current state is ENABLED.
             GENERIC_409_ABORTED:
               $ref: '../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED'
     UnprocessableContent422:

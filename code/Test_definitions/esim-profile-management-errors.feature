@@ -41,14 +41,14 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
     And the response property "$.message" contains a user friendly text
 
     Examples:
-      | endpoint       | operationId            | property             | schema                               |
-      | download       | downloadEsimProfile    | $.esimProfile.eid    | /components/schemas/ESimProfileEid   |
-      | enable         | enableEsimProfile      | $.esimProfile.iccid  | /components/schemas/ESimProfileIccid |
-      | disable        | disableEsimProfile     | $.esimProfile.iccid  | /components/schemas/ESimProfileIccid |
-      | delete         | deleteEsimProfile      | $.esimProfile.iccid  | /components/schemas/ESimProfileIccid |
-      | set-fallback   | setFallbackEsimProfile | $.esimProfile.iccid  | /components/schemas/ESimProfileIccid |
-      | retrieve-status| getEsimProfileStatus   | $.esimProfile.iccid  | /components/schemas/ESimProfileIccid |
-      | retrieve-status| getEsimProfileStatus   | $.esimProfile.eid    | /components/schemas/ESimProfileEid   |
+      | endpoint       | operationId            | property             | schema                                |
+      | download       | downloadEsimProfile    | $.esimProfile.eid    | #/components/schemas/ESimProfileEid   |
+      | enable         | enableEsimProfile      | $.esimProfile.iccid  | #/components/schemas/ESimProfileIccid |
+      | disable        | disableEsimProfile     | $.esimProfile.iccid  | #/components/schemas/ESimProfileIccid |
+      | delete         | deleteEsimProfile      | $.esimProfile.iccid  | #/components/schemas/ESimProfileIccid |
+      | set-fallback   | setFallbackEsimProfile | $.esimProfile.iccid  | #/components/schemas/ESimProfileIccid |
+      | retrieve-status| getEsimProfileStatus   | $.esimProfile.iccid  | #/components/schemas/ESimProfileIccid |
+      | retrieve-status| getEsimProfileStatus   | $.esimProfile.eid    | #/components/schemas/ESimProfileEid   |
 
   @esim_profile_errors_400_02_required_property_missing
   Scenario Outline: <operationId> is rejected when a required property is missing
@@ -246,7 +246,7 @@ Feature: CAMARA eSIM Profile Management API, vwip - Error and semantic scenarios
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
-    And the response body complies with the OAS schema at "/components/schemas/ESimProfileResponse"
+    And the response body complies with the OAS schema at "#/components/schemas/ESimProfileResponse"
     And the response property "$.status" is "COMPLETED"
     And the response property "$.result.outcome" is "FAILED"
     And the response property "$.result.failureReason" exists
