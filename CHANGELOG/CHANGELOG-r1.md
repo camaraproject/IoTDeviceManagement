@@ -71,7 +71,7 @@ Changes documented below are compared to version 0.1.0-rc.2.
 
 ### Fixed
 
-* N/A
+* The `409 INCOMPATIBLE_STATE` example now uses this API's own eSIM Profile states (`ENABLED`/`DISABLED`), replacing the Commonalities example with its inapplicable `AVAILABLE`/`UNAVAILABLE` wording.
 
 ### Removed
 
